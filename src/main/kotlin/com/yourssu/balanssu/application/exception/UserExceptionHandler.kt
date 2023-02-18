@@ -4,7 +4,7 @@ import com.yourssu.balanssu.core.response.ErrorResponse
 import com.yourssu.balanssu.domain.exception.CannotRefreshTokenException
 import com.yourssu.balanssu.domain.exception.JwtException
 import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
-import com.yourssu.balanssu.domain.exception.UserAlreadyExistsException
+import com.yourssu.balanssu.domain.exception.CannotSignUpException
 import com.yourssu.balanssu.domain.exception.UserException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
 import org.springframework.http.HttpStatus
@@ -19,7 +19,7 @@ class UserExceptionHandler {
     fun handleNotFoundException(exception: UserException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
 
-    @ExceptionHandler(UserAlreadyExistsException::class, PasswordNotMatchedException::class)
+    @ExceptionHandler(CannotSignUpException::class, PasswordNotMatchedException::class)
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handleConflictException(exception: UserException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)

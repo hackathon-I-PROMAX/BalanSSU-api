@@ -31,6 +31,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
+    implementation("com.fasterxml.uuid:java-uuid-generator:4.1.0")
 }
 
 tasks.withType<KotlinCompile> {
