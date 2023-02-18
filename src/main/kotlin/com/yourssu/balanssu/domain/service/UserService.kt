@@ -4,7 +4,7 @@ import com.yourssu.balanssu.core.security.JwtTokenProvider
 import com.yourssu.balanssu.core.security.UserRole
 import com.yourssu.balanssu.domain.exception.CannotRefreshTokenException
 import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
-import com.yourssu.balanssu.domain.exception.UserAlreadyExistsException
+import com.yourssu.balanssu.domain.exception.CannotSignUpException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
 import com.yourssu.balanssu.domain.model.dto.AuthTokenDto
 import com.yourssu.balanssu.domain.model.dto.SignInDto
@@ -21,10 +21,19 @@ class UserService(
     private val jwtTokenProvider: JwtTokenProvider
 ) {
     fun signUp(dto: SignUpDto) {
-        if (userRepository.existsByUsername(dto.username)) {
-            throw UserAlreadyExistsException(dto.username)
+        if (userRepository.existsByUsernameOrNickname(dto.username, dto.nickname)) {
+            throw CannotSignUpException()
         }
-        userRepository.save(User(dto.username, dto.password))
+
+        val user = User(
+            username = dto.username,
+            password = dto.password,
+            nickname = dto.nickname,
+            schoolAge = dto.schoolAge,
+            departure = dto.departure,
+            gender = dto.gender
+        )
+        userRepository.save(user)
     }
 
     fun signIn(dto: SignInDto): AuthTokenDto {

@@ -10,16 +10,24 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
-import javax.persistence.UniqueConstraint
 
 @Entity
-@Table(uniqueConstraints = [UniqueConstraint(name = "UK_username", columnNames = ["username"])])
+@Table
 @DynamicUpdate
 class User(
     @Column(unique = true)
     val username: String,
 
     val password: String,
+
+    @Column(unique = true)
+    val nickname: String,
+
+    val schoolAge: String,
+
+    val departure: String,
+
+    val gender: Char
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
