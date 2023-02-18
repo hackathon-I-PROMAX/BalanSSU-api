@@ -22,7 +22,16 @@ class AuthController(private val userService: UserService) {
     @PostMapping("/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
     fun signUp(@RequestBody request: SignUpRequest) =
-        userService.signUp(SignUpDto(request.username, request.password))
+        userService.signUp(
+            SignUpDto(
+                username = request.username,
+                password = request.password,
+                nickname = request.nickname,
+                schoolAge = request.schoolAge,
+                departure = request.departure,
+                gender = request.gender
+            )
+        )
 
     @ApiOperation("로그인")
     @PostMapping("/sign-in")
