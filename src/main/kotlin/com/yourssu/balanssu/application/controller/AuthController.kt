@@ -50,7 +50,7 @@ class AuthController(private val userService: UserService) {
 
     @ApiOperation("로그인")
     @PostMapping("/sign-in")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     fun signIn(@RequestBody request: SignInRequest): TokenResponse {
         val token = userService.signIn(SignInDto(request.username, request.password))
         return TokenResponse(token)
