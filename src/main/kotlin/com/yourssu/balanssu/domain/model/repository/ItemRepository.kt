@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ItemRepository : JpaRepository<Item, Int>
+interface ItemRepository : JpaRepository<Item, Int> {
+    fun findByClientId(clientId: String): Item?
+}

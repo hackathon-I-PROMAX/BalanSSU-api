@@ -31,6 +31,7 @@ class SecurityConfig(
             authorizeRequests {
                 authorize("/auth/**", permitAll)
                 authorize("/admin/**", hasRole(ADMIN))
+                authorize("/categories/**", hasRole(USER))
                 authorize(anyRequest, permitAll)
             }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(
