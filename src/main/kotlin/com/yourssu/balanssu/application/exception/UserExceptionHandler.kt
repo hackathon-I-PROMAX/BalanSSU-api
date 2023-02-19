@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class UserExceptionHandler {
-    @ExceptionHandler(NicknameInUseException::class)
+    @ExceptionHandler(UsernameInUseException::class, NicknameInUseException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleBadRequestException(exception: UserException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
@@ -26,7 +26,7 @@ class UserExceptionHandler {
     fun handleNotFoundException(exception: UserException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
 
-    @ExceptionHandler(CannotSignUpException::class, PasswordNotMatchedException::class, UsernameInUseException::class)
+    @ExceptionHandler(CannotSignUpException::class, PasswordNotMatchedException::class)
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handleConflictException(exception: UserException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
