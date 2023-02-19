@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("org.springframework.boot") version "2.7.8"
@@ -11,6 +12,9 @@ plugins {
 group = "com.yourssu"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
+
+val bootJar: BootJar by tasks
+bootJar.archiveFileName.set("balanSSU.jar")
 
 repositories {
     mavenCentral()
