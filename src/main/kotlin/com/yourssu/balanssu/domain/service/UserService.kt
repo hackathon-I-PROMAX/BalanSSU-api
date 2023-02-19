@@ -13,6 +13,7 @@ import com.yourssu.balanssu.domain.model.dto.SignInDto
 import com.yourssu.balanssu.domain.model.dto.SignUpDto
 import com.yourssu.balanssu.domain.model.entity.User
 import com.yourssu.balanssu.domain.model.repository.UserRepository
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class UserService(
     private val userRepository: UserRepository,
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val passwordEncoder: PasswordEncoder
 ) {
     fun signUp(dto: SignUpDto) {
         if (userRepository.existsByUsernameOrNickname(dto.username, dto.nickname)) {
@@ -29,7 +31,7 @@ class UserService(
 
         val user = User(
             username = dto.username,
-            password = dto.password,
+            password = passwordEncoder.encode(dto.password),
             nickname = dto.nickname,
             schoolAge = dto.schoolAge,
             departure = dto.departure,
@@ -52,7 +54,7 @@ class UserService(
 
     fun signIn(dto: SignInDto): AuthTokenDto {
         val user = userRepository.findByUsername(dto.username) ?: throw UserNotFoundException()
-        if (user.password != dto.password) {
+        if (!passwordEncoder.matches(dto.password, user.password)) {
             throw PasswordNotMatchedException()
         }
 
