@@ -8,5 +8,5 @@ open class JwtException(
     errorCode: JwtErrorCode,
     message: String
 ) : RuntimeException(message) {
-    val errorCode = String.format("AUTH-%03d", errorCode.ordinal + 1)
+    val errorCode = String.format("JWT-%03d", errorCode.ordinal + 1)
 }
