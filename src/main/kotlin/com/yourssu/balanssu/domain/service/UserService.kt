@@ -5,6 +5,7 @@ import com.yourssu.balanssu.core.security.UserRole
 import com.yourssu.balanssu.domain.exception.CannotRefreshTokenException
 import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
 import com.yourssu.balanssu.domain.exception.CannotSignUpException
+import com.yourssu.balanssu.domain.exception.NicknameInUseException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
 import com.yourssu.balanssu.domain.exception.UsernameInUseException
 import com.yourssu.balanssu.domain.model.dto.AuthTokenDto
@@ -40,6 +41,12 @@ class UserService(
     fun validateUsername(username: String) {
         if (userRepository.existsByUsername(username)) {
             throw UsernameInUseException()
+        }
+    }
+
+    fun validateNickname(nickname: String) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw NicknameInUseException()
         }
     }
 
