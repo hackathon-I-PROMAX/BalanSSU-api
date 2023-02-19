@@ -14,7 +14,7 @@ import javax.persistence.Table
 @Entity
 @Table
 class Category(
-    val title: String,
+    val title: String
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +24,10 @@ class Category(
 
     val deadline: LocalDate = LocalDate.now().plusDays(7)
 
+    @OneToMany(mappedBy = "category")
+    lateinit var items: List<Item>
+
     @OneToOne
     @JoinColumn(name = "first_place")
     lateinit var firstPlace: Item
-
-    @OneToMany(mappedBy = "category")
-    val items: List<Item> = mutableListOf()
 }

@@ -16,6 +16,11 @@ class SecurityConfig(
     private val objectMapper: ObjectMapper,
     private val jwtTokenProvider: JwtTokenProvider
 ) {
+    companion object {
+        private const val ADMIN = "ADMIN"
+        private const val USER = "USER"
+    }
+
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http {
@@ -24,6 +29,8 @@ class SecurityConfig(
             cors { }
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             authorizeRequests {
+                authorize("/auth/**", permitAll)
+                authorize("/admin/**", hasRole(ADMIN))
                 authorize(anyRequest, permitAll)
             }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(

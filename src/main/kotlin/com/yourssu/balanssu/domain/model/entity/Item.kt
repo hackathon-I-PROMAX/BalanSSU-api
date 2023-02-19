@@ -13,13 +13,11 @@ import javax.persistence.Table
 @Entity
 @Table
 class Item(
-    val path: String,
-
-    val filename: String,
-
     @ManyToOne
-    @JoinColumn(name = "category_id")
-    val category: Category
+    val category: Category,
+    val name: String,
+    val path: String,
+    val filename: String
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)

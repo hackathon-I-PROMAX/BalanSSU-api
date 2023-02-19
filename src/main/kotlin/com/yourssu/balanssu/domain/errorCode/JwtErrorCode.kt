@@ -5,6 +5,5 @@ enum class JwtErrorCode {
     MALFORMED,
     NOT_DECODED,
     EXPIRED,
-    CANNOT_REFRESH,
-    UNKNOWN
+    CANNOT_REFRESH
 }

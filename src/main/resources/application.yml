@@ -32,6 +32,8 @@ application:
     secret-key: ${JWT_SECRET_KEY}
     refresh-token-valid-ms: ${REFRESH_TOKEN_EXPIRE_TIME}
     access-token-valid-ms: ${ACCESS_TOKEN_EXPIRE_TIME}
+  image:
+    path: ${APPLICATION_IMAGE_PATH}
 
   servlet:
     multipart:
