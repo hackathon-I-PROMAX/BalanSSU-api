@@ -37,6 +37,7 @@ dependencies {
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     implementation("com.fasterxml.uuid:java-uuid-generator:4.1.0")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("commons-io:commons-io:2.11.0")
 }
 
 tasks.withType<KotlinCompile> {
