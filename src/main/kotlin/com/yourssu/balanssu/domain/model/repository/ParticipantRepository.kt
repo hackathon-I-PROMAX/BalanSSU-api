@@ -12,4 +12,8 @@ interface ParticipantRepository : JpaRepository<Participant, Int> {
     fun existsByUserAndCategory(user: User, category: Category): Boolean
 
     fun countByCategoryAndItem(category: Category, item: Item): Int
+
+    fun countByCategory(category: Category): Int
+
+    fun findByUserAndCategory(user: User, category: Category): Participant?
 }
