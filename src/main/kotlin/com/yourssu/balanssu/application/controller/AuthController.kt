@@ -3,6 +3,7 @@ package com.yourssu.balanssu.application.controller
 import com.yourssu.balanssu.application.request.RefreshRequest
 import com.yourssu.balanssu.application.request.SignInRequest
 import com.yourssu.balanssu.application.request.SignUpRequest
+import com.yourssu.balanssu.application.request.ValidateUsernameRequest
 import com.yourssu.balanssu.application.response.TokenResponse
 import com.yourssu.balanssu.domain.model.dto.SignInDto
 import com.yourssu.balanssu.domain.model.dto.SignUpDto
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/auth")
@@ -32,6 +34,12 @@ class AuthController(private val userService: UserService) {
                 gender = request.gender
             )
         )
+
+    @ApiOperation("아이디 유효성 검사")
+    @PostMapping("/validation/username")
+    @ResponseStatus(HttpStatus.OK)
+    fun validateUsername(@RequestBody @Valid request: ValidateUsernameRequest) =
+        userService.validateUsername(request.username)
 
     @ApiOperation("로그인")
     @PostMapping("/sign-in")

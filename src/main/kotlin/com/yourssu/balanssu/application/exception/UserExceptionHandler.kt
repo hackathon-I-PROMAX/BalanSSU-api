@@ -7,6 +7,7 @@ import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
 import com.yourssu.balanssu.domain.exception.CannotSignUpException
 import com.yourssu.balanssu.domain.exception.UserException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
+import com.yourssu.balanssu.domain.exception.UsernameInUseException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -19,7 +20,7 @@ class UserExceptionHandler {
     fun handleNotFoundException(exception: UserException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
 
-    @ExceptionHandler(CannotSignUpException::class, PasswordNotMatchedException::class)
+    @ExceptionHandler(CannotSignUpException::class, PasswordNotMatchedException::class, UsernameInUseException::class)
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handleConflictException(exception: UserException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)

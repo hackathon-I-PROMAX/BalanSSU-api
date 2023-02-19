@@ -6,6 +6,7 @@ import com.yourssu.balanssu.domain.exception.CannotRefreshTokenException
 import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
 import com.yourssu.balanssu.domain.exception.CannotSignUpException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
+import com.yourssu.balanssu.domain.exception.UsernameInUseException
 import com.yourssu.balanssu.domain.model.dto.AuthTokenDto
 import com.yourssu.balanssu.domain.model.dto.SignInDto
 import com.yourssu.balanssu.domain.model.dto.SignUpDto
@@ -34,6 +35,12 @@ class UserService(
             gender = dto.gender
         )
         userRepository.save(user)
+    }
+
+    fun validateUsername(username: String) {
+        if (userRepository.existsByUsername(username)) {
+            throw UsernameInUseException()
+        }
     }
 
     fun signIn(dto: SignInDto): AuthTokenDto {
