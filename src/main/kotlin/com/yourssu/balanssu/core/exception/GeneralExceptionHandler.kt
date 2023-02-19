@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.HttpMediaTypeNotSupportedException
 import org.springframework.web.HttpRequestMethodNotSupportedException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -49,18 +50,27 @@ class GeneralExceptionHandler {
     fun handleMethodArgumentTypeMismatch(exception: MethodArgumentTypeMismatchException) =
         ErrorResponse(HttpStatus.BAD_REQUEST, "SYSTEM-003", "${exception.name}이 잘못 입력되었습니다.")
 
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleRequestValid(exception: MethodArgumentNotValidException): ErrorResponse {
+        val message = exception.bindingResult.fieldErrors.joinToString("") { fieldError ->
+            "[${fieldError.field}](은)는 ${fieldError.defaultMessage}"
+        }
+        return ErrorResponse(HttpStatus.BAD_REQUEST, "System-004", message)
+    }
+
     @ExceptionHandler(ConstraintViolationException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleRequestValid(exception: ConstraintViolationException) =
-        ErrorResponse(HttpStatus.BAD_REQUEST, "SYSTEM-004", "잘못된 데이터 요청입니다.")
+        ErrorResponse(HttpStatus.BAD_REQUEST, "SYSTEM-005", "잘못된 데이터 요청입니다.")
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleHttpMediaTypeNotSupportedException(exception: HttpMediaTypeNotSupportedException) =
-        ErrorResponse(HttpStatus.BAD_REQUEST, "SYSTEM-005", "지원하지 않는 MediaType 입니다. 요청된 type: ${exception.contentType}")
+        ErrorResponse(HttpStatus.BAD_REQUEST, "SYSTEM-006", "지원하지 않는 MediaType 입니다. 요청된 type: ${exception.contentType}")
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleHttpMethodNotSupportedException(exception: HttpRequestMethodNotSupportedException) =
-        ErrorResponse(HttpStatus.BAD_REQUEST, "SYSTEM-006", "잘못된 Mapping 요청입니다.")
+        ErrorResponse(HttpStatus.BAD_REQUEST, "SYSTEM-007", "잘못된 Mapping 요청입니다.")
 }
