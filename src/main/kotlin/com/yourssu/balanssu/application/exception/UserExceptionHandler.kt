@@ -21,6 +21,11 @@ class UserExceptionHandler {
     fun handleBadRequestException(exception: UserException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
 
+    @ExceptionHandler(CannotRefreshTokenException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun handleUnauthorizedException(exception: JwtException) =
+        ErrorResponse(exception.status, exception.errorCode, exception.message!!)
+
     @ExceptionHandler(UserNotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleNotFoundException(exception: UserException) =
@@ -29,10 +34,5 @@ class UserExceptionHandler {
     @ExceptionHandler(CannotSignUpException::class, PasswordNotMatchedException::class)
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handleConflictException(exception: UserException) =
-        ErrorResponse(exception.status, exception.errorCode, exception.message!!)
-
-    @ExceptionHandler(CannotRefreshTokenException::class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    fun handleUnauthorizedException(exception: JwtException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
 }
