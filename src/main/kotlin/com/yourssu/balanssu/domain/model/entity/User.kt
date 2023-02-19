@@ -37,4 +37,8 @@ class User(
 
     @Enumerated(EnumType.STRING)
     val role: UserRole = UserRole.ROLE_USER
+
+    fun renewRefreshToken(refreshToken: String) {
+        this.refreshToken = refreshToken
+    }
 }

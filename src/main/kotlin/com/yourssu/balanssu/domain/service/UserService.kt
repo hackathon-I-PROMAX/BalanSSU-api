@@ -66,13 +66,15 @@ class UserService(
         return AuthTokenDto(refreshToken, accessToken)
     }
 
-    fun refreshToken(refreshToken: String): AuthTokenDto {
-        val username = jwtTokenProvider.getUsername(refreshToken)
-        if (!userRepository.existsByUsernameAndRefreshToken(username, refreshToken)) {
-            throw CannotRefreshTokenException()
-        }
+    fun refreshToken(token: String): AuthTokenDto {
+        val username = jwtTokenProvider.getUsername(token)
+        val user = userRepository.findByUsernameAndRefreshToken(username, token) ?: throw CannotRefreshTokenException()
 
+        val refreshToken = jwtTokenProvider.generateRefreshToken(username, setOf(UserRole.ROLE_USER))
         val accessToken = jwtTokenProvider.generateAccessToken(username, setOf(UserRole.ROLE_USER))
-        return AuthTokenDto(null, accessToken)
+
+        user.renewRefreshToken(refreshToken.token)
+
+        return AuthTokenDto(refreshToken, accessToken)
     }
 }
