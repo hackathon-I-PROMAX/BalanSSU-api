@@ -3,6 +3,7 @@ package com.yourssu.balanssu.application.controller
 import com.yourssu.balanssu.application.request.RefreshRequest
 import com.yourssu.balanssu.application.request.SignInRequest
 import com.yourssu.balanssu.application.request.SignUpRequest
+import com.yourssu.balanssu.application.request.ValidateNicknameRequest
 import com.yourssu.balanssu.application.request.ValidateUsernameRequest
 import com.yourssu.balanssu.application.response.TokenResponse
 import com.yourssu.balanssu.domain.model.dto.SignInDto
@@ -40,6 +41,12 @@ class AuthController(private val userService: UserService) {
     @ResponseStatus(HttpStatus.OK)
     fun validateUsername(@RequestBody @Valid request: ValidateUsernameRequest) =
         userService.validateUsername(request.username)
+
+    @ApiOperation("닉네임 유효성 검사")
+    @PostMapping("/validation/nickname")
+    @ResponseStatus(HttpStatus.OK)
+    fun validateNickname(@RequestBody @Valid request: ValidateNicknameRequest) =
+        userService.validateNickname(request.nickname)
 
     @ApiOperation("로그인")
     @PostMapping("/sign-in")
