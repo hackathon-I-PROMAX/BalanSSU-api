@@ -2,6 +2,7 @@ package com.yourssu.balanssu.application.controller
 
 import com.yourssu.balanssu.application.request.ViewChoicesRequest
 import com.yourssu.balanssu.application.request.VoteCategoryRequest
+import com.yourssu.balanssu.application.response.ViewCategoriesResponse
 import com.yourssu.balanssu.application.response.ViewChoiceResponse
 import com.yourssu.balanssu.application.response.VoteCategoryResponse
 import com.yourssu.balanssu.core.security.Authenticated
@@ -19,6 +20,14 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/categories")
 class CategoryController(private val categoryService: CategoryService) {
+    @ApiOperation("카테고리 목록 조회")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    fun viewCategories(): ViewCategoriesResponse {
+        val categories = categoryService.viewCategories()
+        return ViewCategoriesResponse(categories)
+    }
+
     @ApiOperation("선택지 투표")
     @PostMapping("/votes")
     @ResponseStatus(HttpStatus.CREATED)
