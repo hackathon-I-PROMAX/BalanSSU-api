@@ -11,4 +11,6 @@ class ViewCategoriesDto(
     val clientId: String = category.clientId
 
     val title: String = category.title
+
+    val participantCount: Int = category.participantCount
 }
