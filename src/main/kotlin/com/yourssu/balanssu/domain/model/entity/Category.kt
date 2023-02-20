@@ -30,4 +30,6 @@ class Category(
     @OneToOne
     @JoinColumn(name = "first_place")
     lateinit var firstPlace: Item
+
+    var participantCount: Int = 0
 }
