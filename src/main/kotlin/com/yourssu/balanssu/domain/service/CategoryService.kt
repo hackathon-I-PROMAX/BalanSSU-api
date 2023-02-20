@@ -9,9 +9,11 @@ import com.yourssu.balanssu.domain.exception.UserNotFoundException
 import com.yourssu.balanssu.domain.model.dto.CreateItemDto
 import com.yourssu.balanssu.domain.model.dto.ViewChoiceDto
 import com.yourssu.balanssu.domain.model.dto.ChoiceDto
+import com.yourssu.balanssu.domain.model.dto.ViewCategoriesDto
 import com.yourssu.balanssu.domain.model.entity.Category
 import com.yourssu.balanssu.domain.model.entity.Item
 import com.yourssu.balanssu.domain.model.entity.Participant
+import com.yourssu.balanssu.domain.model.enums.CategoryType
 import com.yourssu.balanssu.domain.model.repository.CategoryRepository
 import com.yourssu.balanssu.domain.model.repository.ItemRepository
 import com.yourssu.balanssu.domain.model.repository.ParticipantRepository
@@ -35,6 +37,49 @@ class CategoryService(
     @Value("\${application.image.path}")
     private val imagePath: String
 ) {
+    fun viewCategories(): List<ViewCategoriesDto> {
+        val allCategories = categoryRepository.findAll()
+        val hotCategories = getHotCategories(allCategories)
+        val generalCategories = getGeneralCategories(allCategories, hotCategories)
+
+        val today = LocalDate.now(Clock.systemDefaultZone())
+        return getCategories(hotCategories, generalCategories)
+            .map {
+                val dDay = Period.between(today, it.deadline).days
+                val categoryType = when {
+                    hotCategories.contains(it) -> CategoryType.HOT
+                    dDay >= 0 -> CategoryType.GENERAL
+                    else -> CategoryType.EXPIRED
+                }
+                ViewCategoriesDto(it, categoryType, dDay)
+            }
+    }
+
+    private fun getHotCategories(categories: List<Category>): List<Category> {
+        val today = LocalDate.now(Clock.systemDefaultZone())
+        return categories
+            .filter { Period.between(today, it.deadline).days >= 0 }
+            .sortedWith(
+                compareByDescending<Category> { it.participantCount }
+                    .thenByDescending { it.id }
+            )
+            .take(3)
+    }
+
+    private fun getGeneralCategories(categories: List<Category>, hottestCategories: List<Category>): List<Category> {
+        val hottestCategoryIds = hottestCategories.map { it.id!! }.toSortedSet()
+        return categories
+            .filter { !hottestCategoryIds.contains(it.id) }
+            .sortedByDescending { it.id }
+    }
+
+    private fun getCategories(hottestCategories: List<Category>, generalCategories: List<Category>): List<Category> {
+        val categories = mutableListOf<Category>()
+        categories.addAll(hottestCategories)
+        categories.addAll(generalCategories)
+        return categories
+    }
+
     fun createCategory(title: String, itemDtos: List<CreateItemDto>) {
         if (categoryRepository.existsByTitle(title)) {
             throw CannotCreateCategoryException()
@@ -100,3 +145,4 @@ class CategoryService(
         )
     }
 }
+
