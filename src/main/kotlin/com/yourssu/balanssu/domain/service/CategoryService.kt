@@ -70,6 +70,9 @@ class CategoryService(
         )
         participantRepository.save(participant)
 
+        category.participantCount = participantRepository.countByCategory(category)
+        categoryRepository.save(category)
+
         return getVoteResult(category)
     }
 
@@ -83,17 +86,15 @@ class CategoryService(
     fun viewChoices(username: String, categoryId: String): ViewChoiceDto {
         val user = userRepository.findByUsername(username) ?: throw UserNotFoundException()
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
-        val choices = getVoteResult(category)
-        val participantCounts = participantRepository.countByCategory(category)
-
         val participant = participantRepository.findByUserAndCategory(user, category)
         val myChoice = participant?.item?.name
+
         return ViewChoiceDto(
             categoryId = category.clientId,
             dDay = Period.between(LocalDate.now(Clock.systemDefaultZone()), category.deadline).days,
             title = category.title,
-            choices = choices,
-            participantCounts = participantCounts,
+            choices = getVoteResult(category),
+            participantCounts = category.participantCount,
             isParticipating = participant != null,
             myChoice = myChoice
         )
