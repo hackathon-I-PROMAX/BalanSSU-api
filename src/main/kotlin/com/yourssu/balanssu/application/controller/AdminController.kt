@@ -1,7 +1,7 @@
 package com.yourssu.balanssu.application.controller
 
 import com.yourssu.balanssu.application.request.CreateCategoryRequest
-import com.yourssu.balanssu.domain.model.dto.CreateItemDto
+import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
 import com.yourssu.balanssu.domain.service.CategoryService
 import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
@@ -21,9 +21,9 @@ class AdminController(private val categoryService: CategoryService) {
     fun createCategory(
         @RequestBody @Valid request: CreateCategoryRequest,
     ) {
-        val itemDtos = request.items.map { itemRequest ->
-            CreateItemDto(itemRequest.name, itemRequest.filename, itemRequest.base64.split(",")[1])
+        val choices = request.choices.map { choiceRequest ->
+            CreateChoiceDto(choiceRequest.name, choiceRequest.filename, choiceRequest.base64.split(",")[1])
         }
-        categoryService.createCategory(request.title, itemDtos)
+        categoryService.createCategory(request.title, choices)
     }
 }

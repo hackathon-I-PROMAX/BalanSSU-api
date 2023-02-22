@@ -20,8 +20,8 @@ class Participant(
     val user: User,
 
     @OneToOne
-    @JoinColumn(name = "item_id")
-    val item: Item
+    @JoinColumn(name = "choice_id")
+    val choice: Choice
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)

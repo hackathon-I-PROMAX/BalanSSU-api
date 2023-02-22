@@ -5,7 +5,7 @@ import com.yourssu.balanssu.domain.exception.AlreadyVotedException
 import com.yourssu.balanssu.domain.exception.CannotCreateCategoryException
 import com.yourssu.balanssu.domain.exception.CategoryException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
-import com.yourssu.balanssu.domain.exception.ItemNotFoundException
+import com.yourssu.balanssu.domain.exception.ChoiceNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -18,7 +18,7 @@ class CategoryExceptionHandler {
     fun handleBadRequestException(exception: CategoryException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
 
-    @ExceptionHandler(CategoryNotFoundException::class, ItemNotFoundException::class)
+    @ExceptionHandler(CategoryNotFoundException::class, ChoiceNotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleNotFoundException(exception: CategoryException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)

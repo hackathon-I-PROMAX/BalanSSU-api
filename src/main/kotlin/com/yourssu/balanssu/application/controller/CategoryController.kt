@@ -44,7 +44,7 @@ class CategoryController(private val categoryService: CategoryService) {
         @Authenticated userInfo: UserInfo,
         @RequestBody request: VoteCategoryRequest
     ): VoteCategoryResponse {
-        val votes = categoryService.voteCategory(userInfo.username, request.categoryId, request.itemId)
+        val votes = categoryService.voteCategory(userInfo.username, request.categoryId, request.choiceId)
         return VoteCategoryResponse(votes)
     }
 
