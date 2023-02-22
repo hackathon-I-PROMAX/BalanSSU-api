@@ -4,19 +4,19 @@ import com.yourssu.balanssu.core.utils.FileUtil
 import com.yourssu.balanssu.domain.exception.AlreadyVotedException
 import com.yourssu.balanssu.domain.exception.CannotCreateCategoryException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
-import com.yourssu.balanssu.domain.exception.ItemNotFoundException
+import com.yourssu.balanssu.domain.exception.ChoiceNotFoundException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
-import com.yourssu.balanssu.domain.model.dto.CreateItemDto
+import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
 import com.yourssu.balanssu.domain.model.dto.ViewChoiceDto
 import com.yourssu.balanssu.domain.model.dto.ChoiceDto
 import com.yourssu.balanssu.domain.model.dto.MainCategoriesDto
 import com.yourssu.balanssu.domain.model.dto.ViewCategoriesDto
 import com.yourssu.balanssu.domain.model.entity.Category
-import com.yourssu.balanssu.domain.model.entity.Item
+import com.yourssu.balanssu.domain.model.entity.Choice
 import com.yourssu.balanssu.domain.model.entity.Participant
 import com.yourssu.balanssu.domain.model.enums.CategoryType
 import com.yourssu.balanssu.domain.model.repository.CategoryRepository
-import com.yourssu.balanssu.domain.model.repository.ItemRepository
+import com.yourssu.balanssu.domain.model.repository.ChoiceRepository
 import com.yourssu.balanssu.domain.model.repository.ParticipantRepository
 import com.yourssu.balanssu.domain.model.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
@@ -30,12 +30,12 @@ import java.time.Period
 @Service
 @Transactional
 class CategoryService(
-    private val userRepository: UserRepository,
-    private val categoryRepository: CategoryRepository,
-    private val itemRepository: ItemRepository,
-    private val participantRepository: ParticipantRepository,
+        private val userRepository: UserRepository,
+        private val categoryRepository: CategoryRepository,
+        private val choiceRepository: ChoiceRepository,
+        private val participantRepository: ParticipantRepository,
 
-    @Value("\${application.image.path}")
+        @Value("\${application.image.path}")
     private val imagePath: String
 ) {
     fun viewMainCategories(): MainCategoriesDto {
@@ -107,7 +107,7 @@ class CategoryService(
         return categories
     }
 
-    fun createCategory(title: String, itemDtos: List<CreateItemDto>) {
+    fun createCategory(title: String, choicesDto: List<CreateChoiceDto>) {
         if (categoryRepository.existsByTitle(title)) {
             throw CannotCreateCategoryException()
         }
@@ -115,21 +115,21 @@ class CategoryService(
         val category = Category(title)
         categoryRepository.save(category)
 
-        val items = itemDtos.map { dto ->
+        val choices = choicesDto.map { dto ->
             val image = File(File(imagePath, title), dto.filename)
             FileUtil.convertBase64ToImage(dto.base64, image)
 
-            Item(category, dto.name, image.parent, image.name)
+            Choice(category, dto.name, image.parent, image.name)
         }
-        itemRepository.saveAll(items)
+        choiceRepository.saveAll(choices)
 
-        category.items = items
+        category.choices = choices
     }
 
-    fun voteCategory(username: String, categoryId: String, itemId: String): List<ChoiceDto> {
+    fun voteCategory(username: String, categoryId: String, choiceId: String): List<ChoiceDto> {
         val user = userRepository.findByUsername(username) ?: throw UserNotFoundException()
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
-        val item = itemRepository.findByClientId(itemId) ?: throw ItemNotFoundException()
+        val choice = choiceRepository.findByClientId(choiceId) ?: throw ChoiceNotFoundException()
 
         if (participantRepository.existsByUserAndCategory(user, category)) {
             throw AlreadyVotedException()
@@ -138,7 +138,7 @@ class CategoryService(
         val participant = Participant(
             user = user,
             category = category,
-            item = item
+            choice = choice
         )
         participantRepository.save(participant)
 
@@ -149,9 +149,9 @@ class CategoryService(
     }
 
     private fun getVoteResult(category: Category) =
-        category.items.map {
+        category.choices.map {
             val name = it.name
-            val counts = participantRepository.countByCategoryAndItem(category, it)
+            val counts = participantRepository.countByCategoryAndChoice(category, it)
             ChoiceDto(it.clientId, name, counts)
         }
 
@@ -159,7 +159,7 @@ class CategoryService(
         val user = userRepository.findByUsername(username) ?: throw UserNotFoundException()
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
         val participant = participantRepository.findByUserAndCategory(user, category)
-        val myChoice = participant?.item?.name
+        val myChoice = participant?.choice?.name
 
         return ViewChoiceDto(
             categoryId = category.clientId,
