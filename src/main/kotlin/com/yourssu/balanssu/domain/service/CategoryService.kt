@@ -59,6 +59,7 @@ class CategoryService(
         val today = LocalDate.now(Clock.systemDefaultZone())
         return categories
             .filter { Period.between(today, it.deadline).days >= 0 }
+            .filter { it.participantCount > 0 }
             .sortedWith(
                 compareByDescending<Category> { it.participantCount }
                     .thenByDescending { it.id }
