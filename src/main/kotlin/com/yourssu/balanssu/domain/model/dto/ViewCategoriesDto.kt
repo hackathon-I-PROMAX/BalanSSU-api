@@ -1,16 +1,11 @@
 package com.yourssu.balanssu.domain.model.dto
 
-import com.yourssu.balanssu.domain.model.entity.Category
 import com.yourssu.balanssu.domain.model.enums.CategoryType
 
 class ViewCategoriesDto(
-    category: Category,
+    val categoryId: String,
+    val title: String,
     val type: CategoryType,
-    val dDay: Int
-) {
-    val categoryId: String = category.clientId
-
-    val title: String = category.title
-
-    val participantCount: Int = category.participantCount
-}
+    val dDay: Int,
+    val participantCount: Int
+)
