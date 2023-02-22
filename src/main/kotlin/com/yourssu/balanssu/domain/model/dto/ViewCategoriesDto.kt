@@ -8,7 +8,7 @@ class ViewCategoriesDto(
     val type: CategoryType,
     val dDay: Int
 ) {
-    val clientId: String = category.clientId
+    val categoryId: String = category.clientId
 
     val title: String = category.title
 

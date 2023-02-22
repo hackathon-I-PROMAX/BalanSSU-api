@@ -9,6 +9,7 @@ import com.yourssu.balanssu.domain.exception.UserNotFoundException
 import com.yourssu.balanssu.domain.model.dto.CreateItemDto
 import com.yourssu.balanssu.domain.model.dto.ViewChoiceDto
 import com.yourssu.balanssu.domain.model.dto.ChoiceDto
+import com.yourssu.balanssu.domain.model.dto.MainCategoriesDto
 import com.yourssu.balanssu.domain.model.dto.ViewCategoriesDto
 import com.yourssu.balanssu.domain.model.entity.Category
 import com.yourssu.balanssu.domain.model.entity.Item
@@ -37,25 +38,42 @@ class CategoryService(
     @Value("\${application.image.path}")
     private val imagePath: String
 ) {
-    fun viewCategories(): List<ViewCategoriesDto> {
+    fun viewMainCategories(): MainCategoriesDto {
         val allCategories = categoryRepository.findAll()
-        val hotCategories = getHotCategories(allCategories)
-        val generalCategories = getGeneralCategories(allCategories, hotCategories)
 
         val today = LocalDate.now(Clock.systemDefaultZone())
-        return getCategories(hotCategories, generalCategories)
+        val hottestCategories = getHottestCategories(allCategories).map {
+            val dDay = Period.between(today, it.deadline).days
+            ViewCategoriesDto(it, CategoryType.HOTTEST, dDay)
+        }
+
+        val closedCategories = getClosedCategories(allCategories).map {
+            val dDay = Period.between(today, it.deadline).days
+            ViewCategoriesDto(it, CategoryType.CLOSED, dDay)
+        }
+
+        return MainCategoriesDto(hottestCategories, closedCategories)
+    }
+
+    fun viewCategories(): List<ViewCategoriesDto> {
+        val allCategories = categoryRepository.findAll()
+        val hottestCategories = getHottestCategories(allCategories)
+        val generalCategories = getGeneralCategories(allCategories, hottestCategories)
+
+        val today = LocalDate.now(Clock.systemDefaultZone())
+        return getCategories(hottestCategories, generalCategories)
             .map {
                 val dDay = Period.between(today, it.deadline).days
                 val categoryType = when {
-                    hotCategories.contains(it) -> CategoryType.HOT
+                    hottestCategories.contains(it) -> CategoryType.HOTTEST
                     dDay >= 0 -> CategoryType.GENERAL
-                    else -> CategoryType.EXPIRED
+                    else -> CategoryType.CLOSED
                 }
                 ViewCategoriesDto(it, categoryType, dDay)
             }
     }
 
-    private fun getHotCategories(categories: List<Category>): List<Category> {
+    private fun getHottestCategories(categories: List<Category>): List<Category> {
         val today = LocalDate.now(Clock.systemDefaultZone())
         return categories
             .filter { Period.between(today, it.deadline).days >= 0 }
@@ -72,6 +90,14 @@ class CategoryService(
         return categories
             .filter { !hottestCategoryIds.contains(it.id) }
             .sortedByDescending { it.id }
+    }
+
+    private fun getClosedCategories(categories: List<Category>): List<Category> {
+        val today = LocalDate.now(Clock.systemDefaultZone())
+        return categories
+            .filter { Period.between(today, it.deadline).days < 0 }
+            .sortedByDescending { it.id }
+            .take(3)
     }
 
     private fun getCategories(hottestCategories: List<Category>, generalCategories: List<Category>): List<Category> {
@@ -146,4 +172,3 @@ class CategoryService(
         )
     }
 }
-
