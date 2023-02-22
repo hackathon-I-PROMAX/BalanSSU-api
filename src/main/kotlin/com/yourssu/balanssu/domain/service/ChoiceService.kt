@@ -1,10 +1,12 @@
 package com.yourssu.balanssu.domain.service
 
 import com.yourssu.balanssu.core.utils.FileUtil
+import com.yourssu.balanssu.domain.model.dto.ChoiceDto
 import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
 import com.yourssu.balanssu.domain.model.entity.Category
 import com.yourssu.balanssu.domain.model.entity.Choice
 import com.yourssu.balanssu.domain.model.repository.ChoiceRepository
+import com.yourssu.balanssu.domain.model.repository.ParticipantRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.io.File
@@ -14,6 +16,7 @@ import javax.transaction.Transactional
 @Transactional
 class ChoiceService(
     private val choiceRepository: ChoiceRepository,
+    private val participantRepository: ParticipantRepository,
 
     @Value("\${application.image.path}")
     private val imagePath: String
@@ -42,5 +45,16 @@ class ChoiceService(
             )
         }
         return choiceRepository.saveAll(choices)
+    }
+
+    fun getChoices(category: Category): List<ChoiceDto> {
+        return category.choices.map {
+            ChoiceDto(
+                choiceId = it.clientId,
+                name = it.name,
+
+                count = participantRepository.countByCategoryAndChoice(category, it)
+            )
+        }
     }
 }

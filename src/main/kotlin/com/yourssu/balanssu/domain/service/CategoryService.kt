@@ -5,11 +5,13 @@ import com.yourssu.balanssu.domain.exception.CategoryAlreadyExistsException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
 import com.yourssu.balanssu.domain.exception.ChoiceNotFoundException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
+import com.yourssu.balanssu.domain.model.dto.CategoryDto
 import com.yourssu.balanssu.domain.model.dto.ChoiceDto
+import com.yourssu.balanssu.domain.model.dto.CommentDto
 import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
 import com.yourssu.balanssu.domain.model.dto.MainCategoriesDto
 import com.yourssu.balanssu.domain.model.dto.ViewCategoriesDto
-import com.yourssu.balanssu.domain.model.dto.ViewChoiceDto
+import com.yourssu.balanssu.domain.model.dto.ViewCategoryDto
 import com.yourssu.balanssu.domain.model.entity.Category
 import com.yourssu.balanssu.domain.model.entity.Participant
 import com.yourssu.balanssu.domain.model.enums.CategoryType
@@ -123,6 +125,29 @@ class CategoryService(
         ).flatten()
     }
 
+    fun viewCategory(username: String, categoryId: String): ViewCategoryDto {
+        val user = userRepository.findByUsername(username) ?: throw UserNotFoundException()
+        val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
+        val participant = participantRepository.findByUserAndCategory(user, category)
+
+        val categoryDto = CategoryDto(
+            categoryId = category.clientId,
+            title = category.title,
+            dDay = Period.between(LocalDate.now(Clock.systemDefaultZone()), category.deadline).days,
+            participantCount = category.participantCount,
+            isParticipating = participant != null,
+            myChoice = participant?.choice?.name
+        )
+        val choicesDto = choiceService.getChoices(category)
+        val commentsDto = emptyList<CommentDto>()
+
+        return ViewCategoryDto(
+            category = categoryDto,
+            choices = choicesDto,
+            comments = commentsDto
+        )
+    }
+
     fun createCategory(title: String, choiceDtos: List<CreateChoiceDto>) {
         val category = saveCategory(title)
         choiceService.createChoices(category, choiceDtos)
@@ -165,21 +190,4 @@ class CategoryService(
             val counts = participantRepository.countByCategoryAndChoice(category, it)
             ChoiceDto(it.clientId, name, counts)
         }
-
-    fun viewChoices(username: String, categoryId: String): ViewChoiceDto {
-        val user = userRepository.findByUsername(username) ?: throw UserNotFoundException()
-        val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
-        val participant = participantRepository.findByUserAndCategory(user, category)
-        val myChoice = participant?.choice?.name
-
-        return ViewChoiceDto(
-            categoryId = category.clientId,
-            dDay = Period.between(LocalDate.now(Clock.systemDefaultZone()), category.deadline).days,
-            title = category.title,
-            choices = getVoteResult(category),
-            participantCounts = category.participantCount,
-            isParticipating = participant != null,
-            myChoice = myChoice
-        )
-    }
 }
