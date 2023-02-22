@@ -34,8 +34,3 @@ application:
     access-token-valid-ms: ${ACCESS_TOKEN_EXPIRE_TIME}
   image:
     path: ${APPLICATION_IMAGE_PATH}
-
-  servlet:
-    multipart:
-      max-request-size: ${MAX_REQUEST_SIZE}
-      max-file-size: ${MAX_FILE_SIZE}
