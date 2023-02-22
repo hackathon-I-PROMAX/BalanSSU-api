@@ -21,9 +21,7 @@ class AdminController(private val categoryService: CategoryService) {
     fun createCategory(
         @RequestBody @Valid request: CreateCategoryRequest,
     ) {
-        val choices = request.choices.map { choiceRequest ->
-            CreateChoiceDto(choiceRequest.name, choiceRequest.filename, choiceRequest.base64.split(",")[1])
-        }
+        val choices = request.choices.map { CreateChoiceDto(it.name, it.filename, it.base64.split(",")[1]) }
         categoryService.createCategory(request.title, choices)
     }
 }

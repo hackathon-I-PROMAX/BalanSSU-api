@@ -1,28 +1,24 @@
 package com.yourssu.balanssu.domain.service
 
-import com.yourssu.balanssu.core.utils.FileUtil
 import com.yourssu.balanssu.domain.exception.AlreadyVotedException
-import com.yourssu.balanssu.domain.exception.CannotCreateCategoryException
+import com.yourssu.balanssu.domain.exception.CategoryAlreadyExistsException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
 import com.yourssu.balanssu.domain.exception.ChoiceNotFoundException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
-import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
-import com.yourssu.balanssu.domain.model.dto.ViewChoiceDto
 import com.yourssu.balanssu.domain.model.dto.ChoiceDto
+import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
 import com.yourssu.balanssu.domain.model.dto.MainCategoriesDto
 import com.yourssu.balanssu.domain.model.dto.ViewCategoriesDto
+import com.yourssu.balanssu.domain.model.dto.ViewChoiceDto
 import com.yourssu.balanssu.domain.model.entity.Category
-import com.yourssu.balanssu.domain.model.entity.Choice
 import com.yourssu.balanssu.domain.model.entity.Participant
 import com.yourssu.balanssu.domain.model.enums.CategoryType
 import com.yourssu.balanssu.domain.model.repository.CategoryRepository
 import com.yourssu.balanssu.domain.model.repository.ChoiceRepository
 import com.yourssu.balanssu.domain.model.repository.ParticipantRepository
 import com.yourssu.balanssu.domain.model.repository.UserRepository
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.io.File
 import java.time.Clock
 import java.time.LocalDate
 import java.time.Period
@@ -30,13 +26,11 @@ import java.time.Period
 @Service
 @Transactional
 class CategoryService(
-        private val userRepository: UserRepository,
-        private val categoryRepository: CategoryRepository,
-        private val choiceRepository: ChoiceRepository,
-        private val participantRepository: ParticipantRepository,
-
-        @Value("\${application.image.path}")
-    private val imagePath: String
+    private val userRepository: UserRepository,
+    private val categoryRepository: CategoryRepository,
+    private val choiceService: ChoiceService,
+    private val choiceRepository: ChoiceRepository,
+    private val participantRepository: ParticipantRepository,
 ) {
     fun viewMainCategories(): MainCategoriesDto {
         val allCategories = categoryRepository.findAll()
@@ -107,23 +101,18 @@ class CategoryService(
         return categories
     }
 
-    fun createCategory(title: String, choicesDto: List<CreateChoiceDto>) {
+    fun createCategory(title: String, choiceDtos: List<CreateChoiceDto>) {
+        val category = saveCategory(title)
+        choiceService.createChoices(category, choiceDtos)
+    }
+
+    private fun saveCategory(title: String): Category {
         if (categoryRepository.existsByTitle(title)) {
-            throw CannotCreateCategoryException()
+            throw CategoryAlreadyExistsException()
         }
 
         val category = Category(title)
-        categoryRepository.save(category)
-
-        val choices = choicesDto.map { dto ->
-            val image = File(File(imagePath, title), dto.filename)
-            FileUtil.convertBase64ToImage(dto.base64, image)
-
-            Choice(category, dto.name, image.parent, image.name)
-        }
-        choiceRepository.saveAll(choices)
-
-        category.choices = choices
+        return categoryRepository.save(category)
     }
 
     fun voteCategory(username: String, categoryId: String, choiceId: String): List<ChoiceDto> {

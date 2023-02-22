@@ -1,7 +1,7 @@
 package com.yourssu.balanssu.domain.errorCode
 
 enum class CategoryErrorCode {
-    CANNOT_CREATE,
+    ALREADY_EXISTS,
     NOT_FOUND,
     ALREADY_VOTED
 }
