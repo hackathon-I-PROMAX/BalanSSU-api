@@ -1,10 +1,8 @@
 package com.yourssu.balanssu.application.controller
 
-import com.yourssu.balanssu.application.request.VoteCategoryRequest
 import com.yourssu.balanssu.application.response.ViewCategoriesResponse
 import com.yourssu.balanssu.application.response.ViewCategoryResponse
 import com.yourssu.balanssu.application.response.ViewMainCategoriesResponse
-import com.yourssu.balanssu.application.response.VoteCategoryResponse
 import com.yourssu.balanssu.core.security.Authenticated
 import com.yourssu.balanssu.core.security.UserInfo
 import com.yourssu.balanssu.domain.service.CategoryService
@@ -12,8 +10,6 @@ import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -50,16 +46,5 @@ class CategoryController(private val categoryService: CategoryService) {
             choices = category.choices,
             comments = category.comments
         )
-    }
-
-    @ApiOperation("선택지 투표")
-    @PostMapping("/choices")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun voteCategory(
-        @Authenticated userInfo: UserInfo,
-        @RequestBody request: VoteCategoryRequest
-    ): VoteCategoryResponse {
-        val votes = categoryService.voteCategory(userInfo.username, request.categoryId, request.choiceId)
-        return VoteCategoryResponse(votes)
     }
 }

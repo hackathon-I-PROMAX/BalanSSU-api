@@ -3,8 +3,8 @@ package com.yourssu.balanssu.domain.exception
 import com.yourssu.balanssu.domain.errorCode.CategoryErrorCode
 import org.springframework.http.HttpStatus
 
-class AlreadyVotedException : CategoryException(
-    status = HttpStatus.CONFLICT,
-    errorCode = CategoryErrorCode.ALREADY_VOTED,
+class AlreadyMadeChoiceException : CategoryException(
+    status = HttpStatus.BAD_REQUEST,
+    errorCode = CategoryErrorCode.ALREADY_MADE_CHOICE,
     message = "이미 투표했습니다."
 )

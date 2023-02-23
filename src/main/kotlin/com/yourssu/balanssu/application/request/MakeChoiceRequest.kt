@@ -1,6 +1,6 @@
 package com.yourssu.balanssu.application.request
 
-class VoteCategoryRequest(
+class MakeChoiceRequest(
     val categoryId: String,
     val choiceId: String
 )
