@@ -37,7 +37,7 @@ class ChoiceService(
     private val imagePath: String
 ) {
     fun createChoices(category: Category, choiceDtos: List<CreateChoiceDto>) {
-        uploadChoiceImages(category.title, choiceDtos)
+//        uploadChoiceImages(category.title, choiceDtos)
         val choices = saveChoices(category, choiceDtos)
         category.choices = choices
     }
