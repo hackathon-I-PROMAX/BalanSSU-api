@@ -10,8 +10,10 @@ class SignUpRequest(
     val password: String,
     @field:Size(min = 3, max = 64, message = "3자리 이상, 64자리 이하의 닉네임을 입력해야 합니다.")
     val nickname: String,
+    @field:Size(min = 2, max = 2, message = "학번은 반드시 2자리를 입력해야 합니다.")
     val schoolAge: String,
     val departure: String,
+    @field:Size(min = 1, max = 1, message = "성별은 반드시 'M' 또는 'F' 중 하나를 입력해야 합니다.")
     val gender: Char
 ) {
     companion object {
