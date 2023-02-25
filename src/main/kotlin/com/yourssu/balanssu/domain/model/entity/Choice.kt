@@ -1,29 +1,25 @@
 package com.yourssu.balanssu.domain.model.entity
 
+import com.yourssu.balanssu.core.utils.UUIDGenerator
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.OneToOne
+import javax.persistence.ManyToOne
 import javax.persistence.Table
 
-@Table
 @Entity
-class Participant(
-    @OneToOne
-    @JoinColumn(name = "category_id")
+@Table
+class Choice(
+    @ManyToOne
     val category: Category,
-
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    val user: User,
-
-    @OneToOne
-    @JoinColumn(name = "choice_id")
-    val choice: Choice
+    val name: String,
+    val path: String,
+    val filename: String
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int? = null
+
+    val clientId: String = UUIDGenerator.generateUUID()
 }

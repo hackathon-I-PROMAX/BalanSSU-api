@@ -2,19 +2,12 @@ package com.yourssu.balanssu.domain.model.entity
 
 import com.yourssu.balanssu.core.utils.UUIDGenerator
 import java.time.LocalDate
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table
 class Category(
-    val title: String,
+    val title: String
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +17,8 @@ class Category(
 
     val deadline: LocalDate = LocalDate.now().plusDays(7)
 
-    @OneToOne
-    @JoinColumn(name = "first_place")
-    lateinit var firstPlace: Item
-
     @OneToMany(mappedBy = "category")
-    val items: List<Item> = mutableListOf()
+    lateinit var choices: List<Choice>
+
+    var participantCount: Int = 0
 }

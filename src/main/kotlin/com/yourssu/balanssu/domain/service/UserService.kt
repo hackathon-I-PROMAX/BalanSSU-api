@@ -58,8 +58,8 @@ class UserService(
             throw PasswordNotMatchedException()
         }
 
-        val refreshToken = jwtTokenProvider.generateRefreshToken(dto.username, setOf(UserRole.ROLE_USER))
-        val accessToken = jwtTokenProvider.generateAccessToken(dto.username, setOf(UserRole.ROLE_USER))
+        val refreshToken = jwtTokenProvider.generateRefreshToken(dto.username, setOf(user.role))
+        val accessToken = jwtTokenProvider.generateAccessToken(dto.username, setOf(user.role))
 
         user.refreshToken = refreshToken.token
 

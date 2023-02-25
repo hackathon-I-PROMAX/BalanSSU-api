@@ -32,36 +32,14 @@ class JwtAuthenticationFilter(
                 SecurityContextHolder.getContext().authentication = jwtTokenProvider.getAuthentication(claims)
             }
             filterChain.doFilter(request, response)
-        } catch (exception: Exception) {
-            val errorCode: JwtErrorCode
-            val message: String
-            when (exception) {
-                is SignatureException -> {
-                    errorCode = JwtErrorCode.INVALID
-                    message = "유효하지 않은 토큰입니다."
-                }
-
-                is MalformedJwtException -> {
-                    errorCode = JwtErrorCode.MALFORMED
-                    message = "손상된 토큰입니다."
-                }
-
-                is DecodingException -> {
-                    errorCode = JwtErrorCode.NOT_DECODED
-                    message = "잘못된 인증입니다."
-                }
-
-                is ExpiredJwtException -> {
-                    errorCode = JwtErrorCode.EXPIRED
-                    message = "만료된 토큰입니다."
-                }
-
-                else -> {
-                    errorCode = JwtErrorCode.UNKNOWN
-                    message = "UNKNOWN EXCEPTION"
-                }
-            }
-            sendErrorMessage(response, JwtException(HttpStatus.UNAUTHORIZED, errorCode, message))
+        } catch (exception: SignatureException) {
+            sendErrorMessage(response, JwtException(HttpStatus.UNAUTHORIZED, JwtErrorCode.INVALID, "유효하지 않은 토큰입니다."))
+        } catch (exception: MalformedJwtException) {
+            sendErrorMessage(response, JwtException(HttpStatus.UNAUTHORIZED, JwtErrorCode.MALFORMED, "손상된 토큰입니다."))
+        } catch (exception: DecodingException) {
+            sendErrorMessage(response, JwtException(HttpStatus.UNAUTHORIZED, JwtErrorCode.NOT_DECODED, "잘못된 인증입니다."))
+        } catch (exception: ExpiredJwtException) {
+            sendErrorMessage(response, JwtException(HttpStatus.UNAUTHORIZED, JwtErrorCode.EXPIRED, "만료된 토큰입니다."))
         }
     }
 
