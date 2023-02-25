@@ -134,7 +134,7 @@ class CategoryService(
             dDay = Period.between(LocalDate.now(Clock.systemDefaultZone()), category.deadline).days,
             participantCount = category.participantCount,
             isParticipating = participant != null,
-            myChoice = participant?.choice?.name
+            myChoice = participant?.choice?.clientId
         )
         val choicesDto = choiceService.getChoices(category)
         val commentsDto = emptyList<CommentDto>()
