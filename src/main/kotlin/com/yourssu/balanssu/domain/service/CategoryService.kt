@@ -92,7 +92,7 @@ class CategoryService(
     private fun getClosedCategories(categories: List<Category>): List<Category> {
         val today = LocalDate.now(Clock.systemDefaultZone())
         return categories
-            .filter { Period.between(today, it.deadline).days in (-3..-1) }
+            .filter { Period.between(today, it.deadline).days < 0 }
             .sortedByDescending { it.id }
     }
 
@@ -117,7 +117,9 @@ class CategoryService(
         return listOf(
             hottestCategories.map { categoryToDto(it, CategoryType.HOTTEST) },
             openCategories.map { categoryToDto(it, CategoryType.OPEN) },
-            closedCategories.map { categoryToDto(it, CategoryType.CLOSED) }
+            closedCategories
+                .map { categoryToDto(it, CategoryType.CLOSED) }
+                .filter { it.dDay in (-3..-1) }
         ).flatten()
     }
 
