@@ -32,12 +32,12 @@ class CategoryService(
         val allCategories = categoryRepository.findAll()
 
         val today = LocalDate.now(Clock.systemDefaultZone())
-        val hottestCategories = getHottestCategories(allCategories).map {
+        val hotCategories = getHotCategories(allCategories).map {
             val dDay = Period.between(today, it.deadline).days
             ViewCategoriesDto(
                 categoryId = it.clientId,
                 title = it.title,
-                type = CategoryType.HOTTEST,
+                type = CategoryType.HOT,
                 dDay = dDay,
                 participantCount = it.participantCount
             )
@@ -56,20 +56,20 @@ class CategoryService(
                 )
             }
 
-        return MainCategoriesDto(hottestCategories, closedCategories)
+        return MainCategoriesDto(hotCategories, closedCategories)
     }
 
     fun viewCategories(): List<ViewCategoriesDto> {
         val categories = categoryRepository.findAll()
 
-        val hottestCategories = getHottestCategories(categories)
+        val hotCategories = getHotCategories(categories)
         val closedCategories = getClosedCategories(categories)
-        val openCategories = getOpenCategories(categories, hottestCategories, closedCategories)
+        val openCategories = getOpenCategories(categories, hotCategories, closedCategories)
 
-        return mergeCategories(hottestCategories, openCategories, closedCategories)
+        return mergeCategories(hotCategories, openCategories, closedCategories)
     }
 
-    private fun getHottestCategories(categories: List<Category>): List<Category> {
+    private fun getHotCategories(categories: List<Category>): List<Category> {
         val today = LocalDate.now(Clock.systemDefaultZone())
         return categories
             .filter { Period.between(today, it.deadline).days >= 0 }
@@ -80,10 +80,10 @@ class CategoryService(
 
     private fun getOpenCategories(
         categories: List<Category>,
-        hottestCategories: List<Category>,
+        hotCategories: List<Category>,
         closedCategories: List<Category>
     ): List<Category> {
-        val excludedCategoryIds = hottestCategories.mapNotNull { it.id } + closedCategories.mapNotNull { it.id }
+        val excludedCategoryIds = hotCategories.mapNotNull { it.id } + closedCategories.mapNotNull { it.id }
         return categories
             .filterNot { it.id in excludedCategoryIds }
             .sortedByDescending { it.id }
@@ -97,7 +97,7 @@ class CategoryService(
     }
 
     private fun mergeCategories(
-        hottestCategories: List<Category>,
+        hotCategories: List<Category>,
         openCategories: List<Category>,
         closedCategories: List<Category>
     ): List<ViewCategoriesDto> {
@@ -115,7 +115,7 @@ class CategoryService(
         }
 
         return listOf(
-            hottestCategories.map { categoryToDto(it, CategoryType.HOTTEST) },
+            hotCategories.map { categoryToDto(it, CategoryType.HOT) },
             openCategories.map { categoryToDto(it, CategoryType.OPEN) },
             closedCategories
                 .map { categoryToDto(it, CategoryType.CLOSED) }

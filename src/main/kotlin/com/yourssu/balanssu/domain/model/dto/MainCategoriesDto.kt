@@ -1,6 +1,6 @@
 package com.yourssu.balanssu.domain.model.dto
 
 class MainCategoriesDto(
-    val hottestCategories: List<ViewCategoriesDto>,
+    val hotCategories: List<ViewCategoriesDto>,
     val closedCategories: List<ViewCategoriesDto>
 )

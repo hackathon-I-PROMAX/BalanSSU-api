@@ -22,7 +22,7 @@ class CategoryController(private val categoryService: CategoryService) {
     @ResponseStatus(HttpStatus.OK)
     fun viewMainCategories(): ViewMainCategoriesResponse {
         val categories = categoryService.viewMainCategories()
-        return ViewMainCategoriesResponse(categories.hottestCategories, categories.closedCategories)
+        return ViewMainCategoriesResponse(categories.hotCategories, categories.closedCategories)
     }
 
     @ApiOperation("카테고리 목록 조회")
