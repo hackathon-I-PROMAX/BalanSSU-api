@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service
 import java.io.File
 import java.time.Clock
 import java.time.LocalDate
-import java.time.Period
+import java.time.temporal.ChronoUnit
 import javax.transaction.Transactional
 
 @Service
@@ -83,7 +83,7 @@ class ChoiceService(
         val categoryDto = CategoryDto(
             categoryId = category.clientId,
             title = category.title,
-            dDay = Period.between(LocalDate.now(Clock.systemDefaultZone()), category.deadline).days,
+            dDay = ChronoUnit.DAYS.between(LocalDate.now(Clock.systemDefaultZone()), category.deadline),
             participantCount = category.participantCount,
             isParticipating = true,
             myChoice = participant.choice.name
