@@ -1,5 +1,6 @@
 package com.yourssu.balanssu.domain.service
 
+import com.yourssu.balanssu.core.utils.DDayCalculator
 import com.yourssu.balanssu.domain.exception.CategoryAlreadyExistsException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
@@ -14,12 +15,11 @@ import com.yourssu.balanssu.domain.model.enums.CategoryType
 import com.yourssu.balanssu.domain.model.repository.CategoryRepository
 import com.yourssu.balanssu.domain.model.repository.ParticipantRepository
 import com.yourssu.balanssu.domain.model.repository.UserRepository
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.LocalDate
-import java.time.Period
 import java.time.temporal.ChronoUnit
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
@@ -34,7 +34,7 @@ class CategoryService(
         val allCategories = categoryRepository.findAll()
 
         val hotCategories = getHotCategories(today, allCategories).map {
-            val dDay = ChronoUnit.DAYS.between(today, it.deadline)
+            val dDay = DDayCalculator.getDDay(today, it.deadline)
             ViewCategoriesDto(
                 categoryId = it.clientId,
                 title = it.title,
@@ -73,7 +73,7 @@ class CategoryService(
 
     private fun getHotCategories(today: LocalDate, categories: List<Category>): List<Category> {
         return categories
-            .filter { Period.between(today, it.deadline).days >= 0 }
+            .filter { DDayCalculator.getDDay(today, it.deadline) >= 0 }
             .filter { it.participantCount > 0 }
             .sortedWith(compareByDescending<Category> { it.participantCount }.thenByDescending { it.id })
             .take(3)
@@ -92,7 +92,7 @@ class CategoryService(
 
     private fun getClosedCategories(today: LocalDate, categories: List<Category>): List<Category> {
         return categories
-            .filter { Period.between(today, it.deadline).days < 0 }
+            .filter { DDayCalculator.getDDay(today, it.deadline) < 0 }
             .sortedByDescending { it.id }
     }
 
