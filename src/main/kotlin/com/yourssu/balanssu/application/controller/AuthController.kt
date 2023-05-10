@@ -32,7 +32,7 @@ class AuthController(private val userService: UserService) {
                 nickname = request.nickname,
                 schoolAge = request.schoolAge,
                 departure = request.departure,
-                gender = request.gender
+                gender = request.gender[0]
             )
         )
 

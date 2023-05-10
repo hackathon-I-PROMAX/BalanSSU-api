@@ -1,5 +1,6 @@
 package com.yourssu.balanssu.domain.service
 
+import com.yourssu.balanssu.core.utils.DDayCalculator
 import com.yourssu.balanssu.domain.exception.CategoryAlreadyExistsException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
@@ -14,11 +15,11 @@ import com.yourssu.balanssu.domain.model.enums.CategoryType
 import com.yourssu.balanssu.domain.model.repository.CategoryRepository
 import com.yourssu.balanssu.domain.model.repository.ParticipantRepository
 import com.yourssu.balanssu.domain.model.repository.UserRepository
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.LocalDate
-import java.time.Period
+import java.time.temporal.ChronoUnit
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
@@ -29,24 +30,24 @@ class CategoryService(
     private val participantRepository: ParticipantRepository,
 ) {
     fun viewMainCategories(): MainCategoriesDto {
+        val today = LocalDate.now(Clock.systemDefaultZone())
         val allCategories = categoryRepository.findAll()
 
-        val today = LocalDate.now(Clock.systemDefaultZone())
-        val hottestCategories = getHottestCategories(allCategories).map {
-            val dDay = Period.between(today, it.deadline).days
+        val hotCategories = getHotCategories(today, allCategories).map {
+            val dDay = DDayCalculator.getDDay(today, it.deadline)
             ViewCategoriesDto(
                 categoryId = it.clientId,
                 title = it.title,
-                type = CategoryType.HOTTEST,
+                type = CategoryType.HOT,
                 dDay = dDay,
                 participantCount = it.participantCount
             )
         }
 
-        val closedCategories = getClosedCategories(allCategories)
+        val closedCategories = getClosedCategories(today, allCategories)
             .take(3)
             .map {
-                val dDay = Period.between(today, it.deadline).days
+                val dDay = ChronoUnit.DAYS.between(today, it.deadline)
                 ViewCategoriesDto(
                     categoryId = it.clientId,
                     title = it.title,
@@ -56,23 +57,23 @@ class CategoryService(
                 )
             }
 
-        return MainCategoriesDto(hottestCategories, closedCategories)
+        return MainCategoriesDto(hotCategories, closedCategories)
     }
 
     fun viewCategories(): List<ViewCategoriesDto> {
+        val today = LocalDate.now(Clock.systemDefaultZone())
         val categories = categoryRepository.findAll()
 
-        val hottestCategories = getHottestCategories(categories)
-        val closedCategories = getClosedCategories(categories)
-        val openCategories = getOpenCategories(categories, hottestCategories, closedCategories)
+        val hotCategories = getHotCategories(today, categories)
+        val closedCategories = getClosedCategories(today, categories)
+        val openCategories = getOpenCategories(categories, hotCategories, closedCategories)
 
-        return mergeCategories(hottestCategories, openCategories, closedCategories)
+        return mergeCategories(hotCategories, openCategories, closedCategories)
     }
 
-    private fun getHottestCategories(categories: List<Category>): List<Category> {
-        val today = LocalDate.now(Clock.systemDefaultZone())
+    private fun getHotCategories(today: LocalDate, categories: List<Category>): List<Category> {
         return categories
-            .filter { Period.between(today, it.deadline).days >= 0 }
+            .filter { DDayCalculator.getDDay(today, it.deadline) >= 0 }
             .filter { it.participantCount > 0 }
             .sortedWith(compareByDescending<Category> { it.participantCount }.thenByDescending { it.id })
             .take(3)
@@ -80,31 +81,30 @@ class CategoryService(
 
     private fun getOpenCategories(
         categories: List<Category>,
-        hottestCategories: List<Category>,
+        hotCategories: List<Category>,
         closedCategories: List<Category>
     ): List<Category> {
-        val excludedCategoryIds = hottestCategories.mapNotNull { it.id } + closedCategories.mapNotNull { it.id }
+        val excludedCategoryIds = hotCategories.mapNotNull { it.id } + closedCategories.mapNotNull { it.id }
         return categories
             .filterNot { it.id in excludedCategoryIds }
             .sortedByDescending { it.id }
     }
 
-    private fun getClosedCategories(categories: List<Category>): List<Category> {
-        val today = LocalDate.now(Clock.systemDefaultZone())
+    private fun getClosedCategories(today: LocalDate, categories: List<Category>): List<Category> {
         return categories
-            .filter { Period.between(today, it.deadline).days < 0 }
+            .filter { DDayCalculator.getDDay(today, it.deadline) < 0 }
             .sortedByDescending { it.id }
     }
 
     private fun mergeCategories(
-        hottestCategories: List<Category>,
+        hotCategories: List<Category>,
         openCategories: List<Category>,
         closedCategories: List<Category>
     ): List<ViewCategoriesDto> {
-        val today = LocalDate.now()
+        val today = LocalDate.now(Clock.systemDefaultZone())
 
         fun categoryToDto(category: Category, type: CategoryType): ViewCategoriesDto {
-            val dDay = Period.between(today, category.deadline).days
+            val dDay = ChronoUnit.DAYS.between(today, category.deadline)
             return ViewCategoriesDto(
                 categoryId = category.clientId,
                 title = category.title,
@@ -115,7 +115,7 @@ class CategoryService(
         }
 
         return listOf(
-            hottestCategories.map { categoryToDto(it, CategoryType.HOTTEST) },
+            hotCategories.map { categoryToDto(it, CategoryType.HOT) },
             openCategories.map { categoryToDto(it, CategoryType.OPEN) },
             closedCategories
                 .map { categoryToDto(it, CategoryType.CLOSED) }
@@ -131,10 +131,10 @@ class CategoryService(
         val categoryDto = CategoryDto(
             categoryId = category.clientId,
             title = category.title,
-            dDay = Period.between(LocalDate.now(Clock.systemDefaultZone()), category.deadline).days,
+            dDay = ChronoUnit.DAYS.between(LocalDate.now(Clock.systemDefaultZone()), category.deadline),
             participantCount = category.participantCount,
             isParticipating = participant != null,
-            myChoice = participant?.choice?.name
+            myChoice = participant?.choice?.clientId
         )
         val choicesDto = choiceService.getChoices(category)
         val commentsDto = emptyList<CommentDto>()

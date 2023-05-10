@@ -6,6 +6,6 @@ class ViewCategoriesDto(
     val categoryId: String,
     val title: String,
     val type: CategoryType,
-    val dDay: Int,
+    val dDay: Long,
     val participantCount: Int
 )

@@ -1,6 +1,7 @@
 package com.yourssu.balanssu.domain.model.entity
 
 import com.yourssu.balanssu.core.utils.UUIDGenerator
+import java.time.Clock
 import java.time.LocalDate
 import javax.persistence.*
 
@@ -15,7 +16,7 @@ class Category(
 
     val clientId: String = UUIDGenerator.generateUUID()
 
-    val deadline: LocalDate = LocalDate.now().plusDays(7)
+    val deadline: LocalDate = LocalDate.now(Clock.systemDefaultZone()).plusDays(7)
 
     @OneToMany(mappedBy = "category")
     lateinit var choices: List<Choice>

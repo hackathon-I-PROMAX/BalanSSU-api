@@ -1,5 +1,6 @@
 package com.yourssu.balanssu.domain.service
 
+import com.yourssu.balanssu.core.utils.DDayCalculator
 import com.yourssu.balanssu.core.utils.FileUtil
 import com.yourssu.balanssu.domain.exception.AlreadyMadeChoiceException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
@@ -17,13 +18,12 @@ import com.yourssu.balanssu.domain.model.repository.CategoryRepository
 import com.yourssu.balanssu.domain.model.repository.ChoiceRepository
 import com.yourssu.balanssu.domain.model.repository.ParticipantRepository
 import com.yourssu.balanssu.domain.model.repository.UserRepository
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Service
 import java.io.File
 import java.time.Clock
 import java.time.LocalDate
-import java.time.Period
 import javax.transaction.Transactional
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
 
 @Service
 @Transactional
@@ -80,10 +80,11 @@ class ChoiceService(
         val participant = saveChoice(user, category, choice)
         updateCategoryParticipantCount(category)
 
+        val today = LocalDate.now(Clock.systemDefaultZone())
         val categoryDto = CategoryDto(
             categoryId = category.clientId,
             title = category.title,
-            dDay = Period.between(LocalDate.now(Clock.systemDefaultZone()), category.deadline).days,
+            dDay = DDayCalculator.getDDay(today, category.deadline),
             participantCount = category.participantCount,
             isParticipating = true,
             myChoice = participant.choice.name
