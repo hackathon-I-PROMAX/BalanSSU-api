@@ -5,7 +5,6 @@ import com.yourssu.balanssu.domain.exception.CategoryAlreadyExistsException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
 import com.yourssu.balanssu.domain.model.dto.CategoryDto
-import com.yourssu.balanssu.domain.model.dto.CommentDto
 import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
 import com.yourssu.balanssu.domain.model.dto.MainCategoriesDto
 import com.yourssu.balanssu.domain.model.dto.ViewCategoriesDto
@@ -137,13 +136,8 @@ class CategoryService(
             myChoice = participant?.choice?.clientId
         )
         val choicesDto = choiceService.getChoices(category)
-        val commentsDto = emptyList<CommentDto>()
 
-        return ViewCategoryDto(
-            category = categoryDto,
-            choices = choicesDto,
-            comments = commentsDto
-        )
+        return ViewCategoryDto(categoryDto, choicesDto)
     }
 
     fun createCategory(title: String, choiceDtos: List<CreateChoiceDto>) {
