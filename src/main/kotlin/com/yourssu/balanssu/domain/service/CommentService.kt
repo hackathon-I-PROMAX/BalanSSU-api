@@ -1,10 +1,14 @@
 package com.yourssu.balanssu.domain.service
 
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
+import com.yourssu.balanssu.domain.model.dto.CommentDto
 import com.yourssu.balanssu.domain.model.entity.Comment
 import com.yourssu.balanssu.domain.model.repository.CategoryRepository
 import com.yourssu.balanssu.domain.model.repository.CommentRepository
 import com.yourssu.balanssu.domain.model.repository.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,5 +24,23 @@ class CommentService(
         val user = userRepository.findByUsername(username)!!
         val comment = Comment(category, user, content)
         commentRepository.save(comment)
+    }
+
+    fun getComments(username: String, categoryId: String, page: Int, size: Int): Page<CommentDto> {
+        val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
+        val user = userRepository.findByUsername(username)!!
+
+        val pageable = PageRequest.of(page, size, Sort.by("id"))
+        return commentRepository.findAllByCategory(category, pageable).map { comment ->
+            val writer = comment.user
+            CommentDto(
+                writer.nickname,
+                writer.departure,
+                comment.clientId,
+                comment.content,
+                writer == user,
+                writer.isDeleted
+            )
+        }
     }
 }
