@@ -27,4 +27,6 @@ class Comment(
     val id: Int? = null
 
     val clientId: String = UUIDGenerator.generateUUID()
+
+    var isDeleted: Boolean = false
 }
