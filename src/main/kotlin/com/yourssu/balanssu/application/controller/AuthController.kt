@@ -6,6 +6,9 @@ import com.yourssu.balanssu.application.request.SignUpRequest
 import com.yourssu.balanssu.application.request.ValidateNicknameRequest
 import com.yourssu.balanssu.application.request.ValidateUsernameRequest
 import com.yourssu.balanssu.application.response.TokenResponse
+import com.yourssu.balanssu.application.response.ViewUserInfoResponse
+import com.yourssu.balanssu.core.security.Authenticated
+import com.yourssu.balanssu.core.security.UserInfo
 import com.yourssu.balanssu.domain.model.dto.SignInDto
 import com.yourssu.balanssu.domain.model.dto.SignUpDto
 import com.yourssu.balanssu.domain.service.UserService
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
+import org.springframework.web.bind.annotation.GetMapping
 
 @RestController
 @RequestMapping("/auth")
@@ -54,6 +58,14 @@ class AuthController(private val userService: UserService) {
     fun signIn(@RequestBody request: SignInRequest): TokenResponse {
         val token = userService.signIn(SignInDto(request.username, request.password))
         return TokenResponse(token)
+    }
+
+    @ApiOperation("사용자 정보 조회")
+    @GetMapping("/info")
+    @ResponseStatus(HttpStatus.OK)
+    fun viewUserInfo(@Authenticated userInfo: UserInfo): ViewUserInfoResponse {
+        val user = userService.getUserInfo(userInfo.username)
+        return ViewUserInfoResponse(user)
     }
 
     @ApiOperation("토큰 재발급")

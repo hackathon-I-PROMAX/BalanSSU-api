@@ -11,6 +11,7 @@ import com.yourssu.balanssu.domain.exception.UsernameInUseException
 import com.yourssu.balanssu.domain.model.dto.AuthTokenDto
 import com.yourssu.balanssu.domain.model.dto.SignInDto
 import com.yourssu.balanssu.domain.model.dto.SignUpDto
+import com.yourssu.balanssu.domain.model.dto.UserInfoDto
 import com.yourssu.balanssu.domain.model.entity.User
 import com.yourssu.balanssu.domain.model.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -64,6 +65,11 @@ class UserService(
         user.refreshToken = refreshToken.token
 
         return AuthTokenDto(refreshToken, accessToken)
+    }
+
+    fun getUserInfo(username: String): UserInfoDto {
+        val user = userRepository.findByUsername(username)!!
+        return UserInfoDto(user.username, user.nickname, user.departure, user.schoolAge)
     }
 
     fun refreshToken(token: String): AuthTokenDto {
