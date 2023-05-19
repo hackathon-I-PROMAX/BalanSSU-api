@@ -1,6 +1,8 @@
 package com.yourssu.balanssu.domain.service
 
+import com.yourssu.balanssu.domain.exception.CannotDeleteCommentException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
+import com.yourssu.balanssu.domain.exception.CommentNotFoundException
 import com.yourssu.balanssu.domain.model.dto.CommentDto
 import com.yourssu.balanssu.domain.model.entity.Comment
 import com.yourssu.balanssu.domain.model.repository.CategoryRepository
@@ -42,5 +44,16 @@ class CommentService(
                 writer.isDeleted
             )
         }
+    }
+
+    fun deleteComment(username: String, categoryId: String, commentId: String) {
+        val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
+        val comment =
+            commentRepository.findByClientIdAndCategory(commentId, category) ?: throw CommentNotFoundException()
+        val user = userRepository.findByUsername(username)!!
+        if (comment.user != user) {
+            throw CannotDeleteCommentException()
+        }
+        comment.isDeleted = true
     }
 }
