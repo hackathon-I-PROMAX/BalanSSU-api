@@ -2,6 +2,7 @@ package com.yourssu.balanssu.domain.model.entity
 
 import com.yourssu.balanssu.core.security.UserRole
 import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.annotations.Where
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
@@ -14,6 +15,7 @@ import javax.persistence.Table
 @Entity
 @Table
 @DynamicUpdate
+@Where(clause = "is_deleted = 0")
 class User(
     @Column(unique = true)
     val username: String,

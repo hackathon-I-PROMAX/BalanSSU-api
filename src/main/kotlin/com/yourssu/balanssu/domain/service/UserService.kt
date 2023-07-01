@@ -83,4 +83,9 @@ class UserService(
 
         return AuthTokenDto(refreshToken, accessToken)
     }
+
+    fun deleteUser(username: String) {
+        val user = userRepository.findByUsername(username)!!
+        user.isDeleted = true
+    }
 }

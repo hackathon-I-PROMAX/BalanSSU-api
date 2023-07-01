@@ -14,6 +14,7 @@ import com.yourssu.balanssu.domain.model.dto.SignUpDto
 import com.yourssu.balanssu.domain.service.UserService
 import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -75,4 +76,10 @@ class AuthController(private val userService: UserService) {
         val token = userService.refreshToken(request.refreshToken)
         return TokenResponse(token)
     }
+
+    @ApiOperation("회원탈퇴")
+    @DeleteMapping("/withdrawal")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteUser(@Authenticated userInfo: UserInfo) =
+        userService.deleteUser(userInfo.username)
 }
