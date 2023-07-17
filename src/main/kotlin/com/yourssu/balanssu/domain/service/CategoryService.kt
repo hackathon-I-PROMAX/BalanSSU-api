@@ -116,9 +116,8 @@ class CategoryService(
         return listOf(
             hotCategories.map { categoryToDto(it, CategoryType.HOT) },
             openCategories.map { categoryToDto(it, CategoryType.OPEN) },
-            closedCategories
-                .map { categoryToDto(it, CategoryType.CLOSED) }
-                .filter { it.dDay in (-3..-1) }
+            closedCategories.map { categoryToDto(it, CategoryType.CLOSED) }
+//                .filter { it.dDay in (-3..-1) }
         ).flatten()
     }
 
