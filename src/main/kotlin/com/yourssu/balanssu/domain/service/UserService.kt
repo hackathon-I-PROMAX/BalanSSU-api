@@ -35,7 +35,7 @@ class UserService(
             password = passwordEncoder.encode(dto.password),
             nickname = dto.nickname,
             schoolAge = dto.schoolAge,
-            departure = dto.departure,
+            mbti = dto.mbti,
             gender = dto.gender
         )
         userRepository.save(user)
@@ -69,7 +69,7 @@ class UserService(
 
     fun getUserInfo(username: String): UserInfoDto {
         val user = userRepository.findByUsername(username)!!
-        return UserInfoDto(user.username, user.nickname, user.departure, user.schoolAge)
+        return UserInfoDto(user.username, user.nickname, user.mbti, user.schoolAge)
     }
 
     fun refreshToken(token: String): AuthTokenDto {

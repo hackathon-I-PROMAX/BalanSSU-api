@@ -5,6 +5,6 @@ class SignUpDto(
     val password: String,
     val nickname: String,
     val schoolAge: String,
-    val departure: String,
+    val mbti: String,
     val gender: Char
 )

@@ -37,7 +37,7 @@ class CommentService(
             val writer = comment.user
             CommentDto(
                 writer.nickname,
-                writer.departure,
+                writer.mbti,
                 comment.clientId,
                 comment.content,
                 writer == user,

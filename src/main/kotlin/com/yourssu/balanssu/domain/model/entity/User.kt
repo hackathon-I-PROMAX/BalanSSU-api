@@ -27,7 +27,8 @@ class User(
 
     val schoolAge: String,
 
-    val departure: String,
+    @Column(columnDefinition = "CHAR(4)")
+    val mbti: String,
 
     val gender: Char
 ) {
