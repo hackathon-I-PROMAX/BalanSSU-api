@@ -54,7 +54,7 @@ class UserService(
     }
 
     fun signIn(dto: SignInDto): AuthTokenDto {
-        val user = userRepository.findByUsername(dto.username) ?: throw UserNotFoundException()
+        val user = userRepository.findByUsernameAndDeletedIsFalse(dto.username) ?: throw UserNotFoundException()
         if (!passwordEncoder.matches(dto.password, user.password)) {
             throw PasswordNotMatchedException()
         }

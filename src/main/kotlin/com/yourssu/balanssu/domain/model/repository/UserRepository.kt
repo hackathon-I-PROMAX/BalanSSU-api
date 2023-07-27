@@ -10,6 +10,8 @@ interface UserRepository : JpaRepository<User, Int> {
 
     fun findByUsername(username: String): User?
 
+    fun findByUsernameAndDeletedIsFalse(username: String): User?
+
     fun findByUsernameAndRefreshToken(username: String, token: String): User?
 
     fun existsByUsername(username: String): Boolean
