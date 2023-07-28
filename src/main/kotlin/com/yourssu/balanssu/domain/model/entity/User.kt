@@ -17,19 +17,22 @@ import org.hibernate.annotations.DynamicUpdate
 @Table
 @DynamicUpdate
 class User(
-    @Column(unique = true)
+    @Column(unique = true, nullable = false, columnDefinition = "VARCHAR(64)")
     val username: String,
 
+    @Column(columnDefinition = "CHAR(60)")
     var password: String?,
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false, columnDefinition = "VARCHAR(64)")
     val nickname: String,
 
+    @Column(columnDefinition = "CHAR(2)")
     var schoolAge: String?,
 
     @Column(columnDefinition = "CHAR(4)")
     var mbti: String?,
 
+    @Column(columnDefinition = "CHAR(1)")
     var gender: Char?
 ) {
     @field:Id
@@ -44,6 +47,7 @@ class User(
     @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     val createdAt = LocalDateTime.now(Clock.systemDefaultZone())
 
+    @Column(columnDefinition = "BIT(1)", nullable = false)
     var isDeleted: Boolean = false
 
     @Column(columnDefinition = "DATETIME")
