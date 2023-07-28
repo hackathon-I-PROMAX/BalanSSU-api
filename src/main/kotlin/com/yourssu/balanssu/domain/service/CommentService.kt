@@ -3,6 +3,7 @@ package com.yourssu.balanssu.domain.service
 import com.yourssu.balanssu.domain.exception.CannotDeleteCommentException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
 import com.yourssu.balanssu.domain.exception.CommentNotFoundException
+import com.yourssu.balanssu.domain.exception.RestrictedUserException
 import com.yourssu.balanssu.domain.model.dto.CommentDto
 import com.yourssu.balanssu.domain.model.entity.Comment
 import com.yourssu.balanssu.domain.model.repository.CategoryRepository
@@ -23,14 +24,14 @@ class CommentService(
 ) {
     fun createComment(username: String, categoryId: String, content: String) {
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
-        val user = userRepository.findByUsername(username)!!
+        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
         val comment = Comment(category, user, content)
         commentRepository.save(comment)
     }
 
     fun getComments(username: String, categoryId: String, page: Int, size: Int): Page<CommentDto> {
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
-        val user = userRepository.findByUsername(username)!!
+        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
 
         val pageable = PageRequest.of(page, size, Sort.by("id"))
         return commentRepository.findAllByCategory(category, pageable).map { comment ->
@@ -50,7 +51,7 @@ class CommentService(
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
         val comment =
             commentRepository.findByClientIdAndCategory(commentId, category) ?: throw CommentNotFoundException()
-        val user = userRepository.findByUsername(username)!!
+        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
         if (comment.user != user) {
             throw CannotDeleteCommentException()
         }

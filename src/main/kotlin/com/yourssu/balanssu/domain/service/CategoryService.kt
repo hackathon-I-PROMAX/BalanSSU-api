@@ -3,7 +3,7 @@ package com.yourssu.balanssu.domain.service
 import com.yourssu.balanssu.core.utils.DDayCalculator
 import com.yourssu.balanssu.domain.exception.CategoryAlreadyExistsException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
-import com.yourssu.balanssu.domain.exception.UserNotFoundException
+import com.yourssu.balanssu.domain.exception.RestrictedUserException
 import com.yourssu.balanssu.domain.model.dto.CategoryDto
 import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
 import com.yourssu.balanssu.domain.model.dto.MainCategoriesDto
@@ -122,7 +122,7 @@ class CategoryService(
     }
 
     fun viewCategory(username: String, categoryId: String): ViewCategoryDto {
-        val user = userRepository.findByUsername(username) ?: throw UserNotFoundException()
+        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
         val participant = participantRepository.findByUserAndCategory(user, category)
 
