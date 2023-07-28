@@ -15,6 +15,8 @@ import com.yourssu.balanssu.domain.model.dto.SignUpDto
 import com.yourssu.balanssu.domain.model.dto.UserInfoDto
 import com.yourssu.balanssu.domain.model.entity.User
 import com.yourssu.balanssu.domain.model.repository.UserRepository
+import java.time.Clock
+import java.time.LocalDateTime
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -90,6 +92,11 @@ class UserService(
 
     fun deleteUser(username: String) {
         val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
+        user.password = null
+        user.schoolAge = null
+        user.mbti = null
+        user.gender = null
         user.isDeleted = true
+        user.deletedAt = LocalDateTime.now(Clock.systemDefaultZone())
     }
 }
