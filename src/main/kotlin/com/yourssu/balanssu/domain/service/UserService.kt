@@ -70,7 +70,7 @@ class UserService(
 
     fun getUserInfo(username: String): UserInfoDto {
         val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
-        return UserInfoDto(user.username, user.nickname, user.mbti, user.schoolAge)
+        return UserInfoDto(user.username, user.nickname, user.mbti!!, user.schoolAge!!)
     }
 
     fun refreshToken(token: String): AuthTokenDto {
