@@ -29,6 +29,7 @@ class SecurityConfig(
             cors { }
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             authorizeRequests {
+                authorize("/auth/withdrawal", hasRole(USER))
                 authorize("/auth/**", permitAll)
                 authorize("/admin/**", hasRole(ADMIN))
                 authorize("/categories/**", hasRole(USER))

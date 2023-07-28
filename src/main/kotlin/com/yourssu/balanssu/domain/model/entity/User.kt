@@ -1,7 +1,8 @@
 package com.yourssu.balanssu.domain.model.entity
 
 import com.yourssu.balanssu.core.security.UserRole
-import org.hibernate.annotations.DynamicUpdate
+import java.time.Clock
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
@@ -10,24 +11,29 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
+import org.hibernate.annotations.DynamicUpdate
 
 @Entity
 @Table
 @DynamicUpdate
 class User(
-    @Column(unique = true)
+    @Column(unique = true, nullable = false, columnDefinition = "VARCHAR(64)")
     val username: String,
 
-    val password: String,
+    @Column(columnDefinition = "CHAR(60)")
+    var password: String?,
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false, columnDefinition = "VARCHAR(64)")
     val nickname: String,
 
-    val schoolAge: String,
+    @Column(columnDefinition = "CHAR(2)")
+    var schoolAge: String?,
 
-    val departure: String,
+    @Column(columnDefinition = "CHAR(4)")
+    var mbti: String?,
 
-    val gender: Char
+    @Column(columnDefinition = "CHAR(1)")
+    var gender: Char?
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +43,15 @@ class User(
 
     @Enumerated(EnumType.STRING)
     val role: UserRole = UserRole.ROLE_USER
+
+    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    val createdAt = LocalDateTime.now(Clock.systemDefaultZone())
+
+    @Column(columnDefinition = "BIT(1)", nullable = false)
+    var isDeleted: Boolean = false
+
+    @Column(columnDefinition = "DATETIME")
+    var deletedAt: LocalDateTime? = null
 
     fun renewRefreshToken(refreshToken: String) {
         this.refreshToken = refreshToken

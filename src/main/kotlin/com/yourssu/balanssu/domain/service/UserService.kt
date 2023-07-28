@@ -6,13 +6,17 @@ import com.yourssu.balanssu.domain.exception.CannotRefreshTokenException
 import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
 import com.yourssu.balanssu.domain.exception.CannotSignUpException
 import com.yourssu.balanssu.domain.exception.NicknameInUseException
+import com.yourssu.balanssu.domain.exception.RestrictedUserException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
 import com.yourssu.balanssu.domain.exception.UsernameInUseException
 import com.yourssu.balanssu.domain.model.dto.AuthTokenDto
 import com.yourssu.balanssu.domain.model.dto.SignInDto
 import com.yourssu.balanssu.domain.model.dto.SignUpDto
+import com.yourssu.balanssu.domain.model.dto.UserInfoDto
 import com.yourssu.balanssu.domain.model.entity.User
 import com.yourssu.balanssu.domain.model.repository.UserRepository
+import java.time.Clock
+import java.time.LocalDateTime
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -34,7 +38,7 @@ class UserService(
             password = passwordEncoder.encode(dto.password),
             nickname = dto.nickname,
             schoolAge = dto.schoolAge,
-            departure = dto.departure,
+            mbti = dto.mbti,
             gender = dto.gender
         )
         userRepository.save(user)
@@ -53,7 +57,7 @@ class UserService(
     }
 
     fun signIn(dto: SignInDto): AuthTokenDto {
-        val user = userRepository.findByUsername(dto.username) ?: throw UserNotFoundException()
+        val user = userRepository.findByUsernameAndIsDeletedIsFalse(dto.username) ?: throw UserNotFoundException()
         if (!passwordEncoder.matches(dto.password, user.password)) {
             throw PasswordNotMatchedException()
         }
@@ -66,9 +70,17 @@ class UserService(
         return AuthTokenDto(refreshToken, accessToken)
     }
 
+    fun getUserInfo(username: String): UserInfoDto {
+        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
+        return UserInfoDto(user.username, user.nickname, user.mbti!!, user.schoolAge!!)
+    }
+
     fun refreshToken(token: String): AuthTokenDto {
         val username = jwtTokenProvider.getUsername(token)
         val user = userRepository.findByUsernameAndRefreshToken(username, token) ?: throw CannotRefreshTokenException()
+        if (user.isDeleted) {
+            throw RestrictedUserException()
+        }
 
         val refreshToken = jwtTokenProvider.generateRefreshToken(username, setOf(UserRole.ROLE_USER))
         val accessToken = jwtTokenProvider.generateAccessToken(username, setOf(UserRole.ROLE_USER))
@@ -76,5 +88,15 @@ class UserService(
         user.renewRefreshToken(refreshToken.token)
 
         return AuthTokenDto(refreshToken, accessToken)
+    }
+
+    fun deleteUser(username: String) {
+        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
+        user.password = null
+        user.schoolAge = null
+        user.mbti = null
+        user.gender = null
+        user.isDeleted = true
+        user.deletedAt = LocalDateTime.now(Clock.systemDefaultZone())
     }
 }

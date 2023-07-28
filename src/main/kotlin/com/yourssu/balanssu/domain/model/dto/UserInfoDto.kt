@@ -1,10 +1,8 @@
 package com.yourssu.balanssu.domain.model.dto
 
-class SignUpDto(
+class UserInfoDto(
     val username: String,
-    val password: String,
     val nickname: String,
-    val schoolAge: String,
     val mbti: String,
-    val gender: Char
+    val schoolAge: String
 )

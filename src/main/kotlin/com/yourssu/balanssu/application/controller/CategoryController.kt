@@ -43,8 +43,7 @@ class CategoryController(private val categoryService: CategoryService) {
         val category = categoryService.viewCategory(userInfo.username, categoryId)
         return ViewCategoryResponse(
             category = category.category,
-            choices = category.choices,
-            comments = category.comments
+            choices = category.choices
         )
     }
 }

@@ -3,9 +3,8 @@ package com.yourssu.balanssu.domain.service
 import com.yourssu.balanssu.core.utils.DDayCalculator
 import com.yourssu.balanssu.domain.exception.CategoryAlreadyExistsException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
-import com.yourssu.balanssu.domain.exception.UserNotFoundException
+import com.yourssu.balanssu.domain.exception.RestrictedUserException
 import com.yourssu.balanssu.domain.model.dto.CategoryDto
-import com.yourssu.balanssu.domain.model.dto.CommentDto
 import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
 import com.yourssu.balanssu.domain.model.dto.MainCategoriesDto
 import com.yourssu.balanssu.domain.model.dto.ViewCategoriesDto
@@ -117,14 +116,13 @@ class CategoryService(
         return listOf(
             hotCategories.map { categoryToDto(it, CategoryType.HOT) },
             openCategories.map { categoryToDto(it, CategoryType.OPEN) },
-            closedCategories
-                .map { categoryToDto(it, CategoryType.CLOSED) }
-                .filter { it.dDay in (-3..-1) }
+            closedCategories.map { categoryToDto(it, CategoryType.CLOSED) }
+//                .filter { it.dDay in (-3..-1) }
         ).flatten()
     }
 
     fun viewCategory(username: String, categoryId: String): ViewCategoryDto {
-        val user = userRepository.findByUsername(username) ?: throw UserNotFoundException()
+        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
         val participant = participantRepository.findByUserAndCategory(user, category)
 
@@ -137,13 +135,8 @@ class CategoryService(
             myChoice = participant?.choice?.clientId
         )
         val choicesDto = choiceService.getChoices(category)
-        val commentsDto = emptyList<CommentDto>()
 
-        return ViewCategoryDto(
-            category = categoryDto,
-            choices = choicesDto,
-            comments = commentsDto
-        )
+        return ViewCategoryDto(categoryDto, choicesDto)
     }
 
     fun createCategory(title: String, choiceDtos: List<CreateChoiceDto>) {
