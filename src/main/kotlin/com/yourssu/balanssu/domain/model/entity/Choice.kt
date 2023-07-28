@@ -13,9 +13,7 @@ import javax.persistence.Table
 class Choice(
     @ManyToOne
     val category: Category,
-    val name: String,
-    val path: String,
-    val filename: String
+    val name: String
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
