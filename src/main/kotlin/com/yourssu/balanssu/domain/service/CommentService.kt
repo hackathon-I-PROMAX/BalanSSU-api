@@ -55,6 +55,6 @@ class CommentService(
         if (comment.user != user) {
             throw CannotDeleteCommentException()
         }
-        comment.isDeleted = true
+        comment.delete()
     }
 }

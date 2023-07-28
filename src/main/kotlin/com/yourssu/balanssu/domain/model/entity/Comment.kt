@@ -1,6 +1,9 @@
 package com.yourssu.balanssu.domain.model.entity
 
 import com.yourssu.balanssu.core.utils.UUIDGenerator
+import java.time.Clock
+import java.time.LocalDateTime
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -31,4 +34,12 @@ class Comment(
     val clientId: String = UUIDGenerator.generateUUID()
 
     var isDeleted: Boolean = false
+
+    @Column(columnDefinition = "DATETIME")
+    var deletedAt: LocalDateTime? = null
+
+    fun delete() {
+        this.isDeleted = true
+        this.deletedAt = LocalDateTime.now(Clock.systemDefaultZone())
+    }
 }
