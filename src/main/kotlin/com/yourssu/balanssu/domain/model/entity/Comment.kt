@@ -25,14 +25,17 @@ class Comment(
     @JoinColumn(name = "user_id")
     val user: User,
 
+    @Column(columnDefinition = "VARCHAR(100)", nullable = false)
     val content: String
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int? = null
 
+    @Column(columnDefinition = "CHAR(36)", nullable = false)
     val clientId: String = UUIDGenerator.generateUUID()
 
+    @Column(columnDefinition = "BIT(1)", nullable = false)
     var isDeleted: Boolean = false
 
     @Column(columnDefinition = "DATETIME")
