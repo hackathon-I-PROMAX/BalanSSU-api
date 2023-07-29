@@ -14,7 +14,7 @@ Describe feature details.
 screenshot needed.
 
 ### Endpoint
-`/~`
+`[Http MEthod] /~`
 
 ### Request
 Token required: 
