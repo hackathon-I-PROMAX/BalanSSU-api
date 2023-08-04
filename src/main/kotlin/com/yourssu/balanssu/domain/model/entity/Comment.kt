@@ -18,11 +18,11 @@ import org.hibernate.annotations.Where
 @Where(clause = "is_deleted = 0")
 class Comment(
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(nullable = false)
     val category: Category,
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(nullable = false)
     val user: User,
 
     @Column(columnDefinition = "VARCHAR(100)", nullable = false)
@@ -34,6 +34,12 @@ class Comment(
 
     @Column(columnDefinition = "CHAR(36)", nullable = false)
     val clientId: String = UUIDGenerator.generateUUID()
+
+    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    val createdAt = LocalDateTime.now(Clock.systemDefaultZone())
+
+    @Column(columnDefinition = "BIT(1)", nullable = false)
+    var isReported: Boolean = false
 
     @Column(columnDefinition = "BIT(1)", nullable = false)
     var isDeleted: Boolean = false
