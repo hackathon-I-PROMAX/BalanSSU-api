@@ -12,6 +12,4 @@ interface CommentRepository : JpaRepository<Comment, Int> {
     fun findAllByCategory(category: Category, pageRequest: PageRequest): Page<Comment>
 
     fun findByClientIdAndCategory(commentId: String, category: Category): Comment?
-
-    fun findByClientIdAndIsDeletedIsFalse(commentId: String): Comment?
 }

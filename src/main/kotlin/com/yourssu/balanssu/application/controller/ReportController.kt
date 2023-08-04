@@ -25,18 +25,27 @@ class ReportController(
     @ResponseStatus(HttpStatus.CREATED)
     fun reportComment(
         @Authenticated userInfo: UserInfo,
+        @PathVariable categoryId: String,
         @PathVariable commentId: String,
         @RequestBody request: ReportCommentRequest
-    ) = reportService.reportComment(userInfo.username, commentId, request.type, request.content, request.email)
+    ) = reportService.reportComment(
+        userInfo.username,
+        categoryId,
+        commentId,
+        request.type,
+        request.content,
+        request.email
+    )
 
     @ApiOperation("댓글을 신고할 수 있는지 확인")
     @GetMapping("/available")
     @ResponseStatus(HttpStatus.CREATED)
     fun isReportAvailable(
         @Authenticated userInfo: UserInfo,
+        @PathVariable categoryId: String,
         @PathVariable commentId: String
     ): ReportAvailableResponse {
-        val dto = reportService.isReportAvailable(userInfo.username, commentId)
+        val dto = reportService.isReportAvailable(userInfo.username, categoryId, commentId)
         return ReportAvailableResponse(dto.isAvailable)
     }
 }
