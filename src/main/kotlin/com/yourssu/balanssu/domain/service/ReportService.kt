@@ -39,7 +39,7 @@ class ReportService(
     }
 
     fun isReportAvailable(username: String, commentId: String): ReportAvailableDto {
-        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
+        val user = userRepository.findByUsername(username)
         val comment = commentRepository.findByClientIdAndIsDeletedIsFalse(commentId) ?: throw CommentNotFoundException()
         val isAvailable = comment.user != user && !reportRepository.existsByUserAndComment(user, comment)
         return ReportAvailableDto(isAvailable)
