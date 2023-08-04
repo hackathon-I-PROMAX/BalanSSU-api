@@ -3,7 +3,6 @@ package com.yourssu.balanssu.domain.service
 import com.yourssu.balanssu.domain.exception.CannotReportOwnCommentException
 import com.yourssu.balanssu.domain.exception.CommentAlreadyReportedException
 import com.yourssu.balanssu.domain.exception.CommentNotFoundException
-import com.yourssu.balanssu.domain.exception.RestrictedUserException
 import com.yourssu.balanssu.domain.model.entity.Report
 import com.yourssu.balanssu.domain.model.repository.CommentRepository
 import com.yourssu.balanssu.domain.model.repository.ReportRepository
@@ -25,7 +24,7 @@ class ReportService(
         content: String?,
         email: String
     ) {
-        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
+        val user = userRepository.findByUsername(username)
         val comment = commentRepository.findByClientIdAndIsDeletedIsFalse(commentId) ?: throw CommentNotFoundException()
 
         if (comment.user == user) {
