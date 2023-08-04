@@ -88,12 +88,6 @@ class UserService(
 
     fun deleteUser(username: String) {
         val user = userRepository.findByUsername(username)
-        user.password = null
-        user.schoolAge = null
-        user.mbti = null
-        user.gender = null
-        user.role = UserRole.ROLE_DELETED_USER
-        user.isDeleted = true
-        user.deletedAt = LocalDateTime.now(Clock.systemDefaultZone())
+        user.delete()
     }
 }

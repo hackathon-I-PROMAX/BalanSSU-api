@@ -57,4 +57,14 @@ class User(
     fun renewRefreshToken(refreshToken: String) {
         this.refreshToken = refreshToken
     }
+
+    fun delete() {
+        this.password = null
+        this.schoolAge = null
+        this.mbti = null
+        this.gender = null
+        this.role = UserRole.ROLE_DELETED_USER
+        this.isDeleted = true
+        this.deletedAt = LocalDateTime.now(Clock.systemDefaultZone())
+    }
 }
