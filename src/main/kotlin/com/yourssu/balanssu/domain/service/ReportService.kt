@@ -3,6 +3,7 @@ package com.yourssu.balanssu.domain.service
 import com.yourssu.balanssu.domain.exception.CannotReportOwnCommentException
 import com.yourssu.balanssu.domain.exception.CommentAlreadyReportedException
 import com.yourssu.balanssu.domain.exception.CommentNotFoundException
+import com.yourssu.balanssu.domain.model.dto.ReportAvailableDto
 import com.yourssu.balanssu.domain.model.entity.Report
 import com.yourssu.balanssu.domain.model.repository.CommentRepository
 import com.yourssu.balanssu.domain.model.repository.ReportRepository
@@ -35,5 +36,12 @@ class ReportService(
 
         val report = Report(user, comment, type, content, email)
         reportRepository.save(report)
+    }
+
+    fun isReportAvailable(username: String, commentId: String): ReportAvailableDto {
+        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
+        val comment = commentRepository.findByClientIdAndIsDeletedIsFalse(commentId) ?: throw CommentNotFoundException()
+        val isAvailable = comment.user != user && !reportRepository.existsByUserAndComment(user, comment)
+        return ReportAvailableDto(isAvailable)
     }
 }
