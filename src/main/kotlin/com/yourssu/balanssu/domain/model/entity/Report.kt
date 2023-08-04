@@ -42,6 +42,6 @@ class Report(
     @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     val reportedAt = LocalDateTime.now(Clock.systemDefaultZone())
 
-    @Column(columnDefinition = "BIT(1) default 0", nullable = false)
+    @Column(columnDefinition = "BIT(1)", nullable = false)
     var isProcessed = false
 }
