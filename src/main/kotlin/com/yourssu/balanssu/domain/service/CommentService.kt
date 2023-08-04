@@ -40,6 +40,7 @@ class CommentService(
                 writer.mbti!!,
                 comment.clientId,
                 comment.content,
+                comment.isReported,
                 writer == user,
                 writer.isDeleted
             )
