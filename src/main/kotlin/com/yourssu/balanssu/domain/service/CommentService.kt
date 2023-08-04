@@ -57,4 +57,11 @@ class CommentService(
         }
         comment.delete()
     }
+
+    fun reportComment(categoryId: String, commentId: String) {
+        val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
+        val comment =
+            commentRepository.findByClientIdAndCategory(commentId, category) ?: throw CommentNotFoundException()
+        comment.isReported = true
+    }
 }
