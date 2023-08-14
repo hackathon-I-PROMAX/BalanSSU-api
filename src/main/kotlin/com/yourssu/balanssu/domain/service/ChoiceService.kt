@@ -4,7 +4,6 @@ import com.yourssu.balanssu.core.utils.DDayCalculator
 import com.yourssu.balanssu.domain.exception.AlreadyMadeChoiceException
 import com.yourssu.balanssu.domain.exception.CategoryNotFoundException
 import com.yourssu.balanssu.domain.exception.ChoiceNotFoundException
-import com.yourssu.balanssu.domain.exception.RestrictedUserException
 import com.yourssu.balanssu.domain.model.dto.CategoryDto
 import com.yourssu.balanssu.domain.model.dto.ChoiceDto
 import com.yourssu.balanssu.domain.model.dto.CreateChoiceDto
@@ -56,7 +55,7 @@ class ChoiceService(
     }
 
     fun makeChoice(username: String, categoryId: String, choiceId: String): MakeChoiceDto {
-        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
+        val user = userRepository.findByUsername(username)
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
         val choice = choiceRepository.findByClientId(choiceId) ?: throw ChoiceNotFoundException()
 
