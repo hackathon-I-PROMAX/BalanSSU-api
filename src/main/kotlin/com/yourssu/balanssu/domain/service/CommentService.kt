@@ -32,7 +32,7 @@ class CommentService(
         val category = categoryRepository.findByClientId(categoryId) ?: throw CategoryNotFoundException()
         val user = userRepository.findByUsername(username)
 
-        val pageable = PageRequest.of(page, size, Sort.by("id"))
+        val pageable = PageRequest.of(page, size, Sort.by("id").descending())
         return commentRepository.findAllByCategory(category, pageable).map { comment ->
             val writer = comment.user
             CommentDto(
