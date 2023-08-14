@@ -11,22 +11,26 @@ import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.Table
-import org.hibernate.annotations.Where
 
-@Entity
 @Table
-@Where(clause = "is_deleted = 0")
-class Comment(
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    val category: Category,
-
+@Entity
+class Report(
     @ManyToOne
     @JoinColumn(nullable = false)
     val user: User,
 
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    val comment: Comment,
+
     @Column(columnDefinition = "VARCHAR(100)", nullable = false)
-    val content: String
+    val type: String,
+
+    @Column(columnDefinition = "VARCHAR(200)")
+    val content: String?,
+
+    @Column(columnDefinition = "VARCHAR(320)", nullable = false)
+    val email: String
 ) {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,19 +40,8 @@ class Comment(
     val clientId: String = UUIDGenerator.generateUUID()
 
     @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    val createdAt = LocalDateTime.now(Clock.systemDefaultZone())
+    val reportedAt = LocalDateTime.now(Clock.systemDefaultZone())
 
     @Column(columnDefinition = "BIT(1)", nullable = false)
-    var isReported: Boolean = false
-
-    @Column(columnDefinition = "BIT(1)", nullable = false)
-    var isDeleted: Boolean = false
-
-    @Column(columnDefinition = "DATETIME")
-    var deletedAt: LocalDateTime? = null
-
-    fun delete() {
-        this.isDeleted = true
-        this.deletedAt = LocalDateTime.now(Clock.systemDefaultZone())
-    }
+    var isProcessed = false
 }

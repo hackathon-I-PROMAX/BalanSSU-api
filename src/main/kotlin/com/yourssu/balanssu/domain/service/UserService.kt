@@ -3,10 +3,9 @@ package com.yourssu.balanssu.domain.service
 import com.yourssu.balanssu.core.security.JwtTokenProvider
 import com.yourssu.balanssu.core.security.UserRole
 import com.yourssu.balanssu.domain.exception.CannotRefreshTokenException
-import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
 import com.yourssu.balanssu.domain.exception.CannotSignUpException
 import com.yourssu.balanssu.domain.exception.NicknameInUseException
-import com.yourssu.balanssu.domain.exception.RestrictedUserException
+import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
 import com.yourssu.balanssu.domain.exception.UsernameInUseException
 import com.yourssu.balanssu.domain.model.dto.AuthTokenDto
@@ -71,16 +70,13 @@ class UserService(
     }
 
     fun getUserInfo(username: String): UserInfoDto {
-        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
+        val user = userRepository.findByUsername(username)
         return UserInfoDto(user.username, user.nickname, user.mbti!!, user.schoolAge!!)
     }
 
     fun refreshToken(token: String): AuthTokenDto {
         val username = jwtTokenProvider.getUsername(token)
         val user = userRepository.findByUsernameAndRefreshToken(username, token) ?: throw CannotRefreshTokenException()
-        if (user.isDeleted) {
-            throw RestrictedUserException()
-        }
 
         val refreshToken = jwtTokenProvider.generateRefreshToken(username, setOf(UserRole.ROLE_USER))
         val accessToken = jwtTokenProvider.generateAccessToken(username, setOf(UserRole.ROLE_USER))
@@ -91,12 +87,7 @@ class UserService(
     }
 
     fun deleteUser(username: String) {
-        val user = userRepository.findByUsernameAndIsDeletedIsFalse(username) ?: throw RestrictedUserException()
-        user.password = null
-        user.schoolAge = null
-        user.mbti = null
-        user.gender = null
-        user.isDeleted = true
-        user.deletedAt = LocalDateTime.now(Clock.systemDefaultZone())
+        val user = userRepository.findByUsername(username)
+        user.delete()
     }
 }

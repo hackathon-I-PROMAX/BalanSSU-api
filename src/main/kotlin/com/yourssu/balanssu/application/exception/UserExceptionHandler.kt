@@ -2,11 +2,10 @@ package com.yourssu.balanssu.application.exception
 
 import com.yourssu.balanssu.core.response.ErrorResponse
 import com.yourssu.balanssu.domain.exception.CannotRefreshTokenException
-import com.yourssu.balanssu.domain.exception.JwtException
-import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
 import com.yourssu.balanssu.domain.exception.CannotSignUpException
+import com.yourssu.balanssu.domain.exception.JwtException
 import com.yourssu.balanssu.domain.exception.NicknameInUseException
-import com.yourssu.balanssu.domain.exception.RestrictedUserException
+import com.yourssu.balanssu.domain.exception.PasswordNotMatchedException
 import com.yourssu.balanssu.domain.exception.UserException
 import com.yourssu.balanssu.domain.exception.UserNotFoundException
 import com.yourssu.balanssu.domain.exception.UsernameInUseException
@@ -22,7 +21,7 @@ class UserExceptionHandler {
     fun handleBadRequestException(exception: UserException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
 
-    @ExceptionHandler(RestrictedUserException::class, CannotRefreshTokenException::class)
+    @ExceptionHandler(CannotRefreshTokenException::class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     fun handleUnauthorizedException(exception: JwtException) =
         ErrorResponse(exception.status, exception.errorCode, exception.message!!)
